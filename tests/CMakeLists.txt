@@ -1,0 +1,3 @@
+add_subdirectory(TestCppClient)
+add_subdirectory(quick_test)
+add_subdirectory(gateway)

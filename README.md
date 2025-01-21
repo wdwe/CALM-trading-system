@@ -1,0 +1,28 @@
+# CALM (Consistent Asset and Liquidity Management) Trading System
+Active work in progress
+
+## About
+This is an automated trading system using Interactive Broker's TWS C++ api.
+
+"Consistent Asset and Liquidity Management" is the backronym for "calm", the state that traders and engineers wish to obtain 
+in their own operations.
+
+## Dependency
+- spdlog `sudo apt install libspdlog-dev`
+
+## Future Performance Improvements
+While good care and efforts are given to ensure the system is efficient and high-performance, ultra-low latency is not the main
+consideration for this first iteration of design. s 
+
+Below are some pointers for future/next iteration.
+- [ ] use lock-free queue and atomic operations
+- [ ] use more POD instead of shared pointers
+- [ ] for hot path, use stack instead of heap storage (i.e. use `std::move` syntax with queue instead of creating shared
+  pointer)
+- [ ] use shared memory instead of message queue to bridge execution system and algo/strategy program
+- [ ] use more `curiously recurring template pattern` to speed up
+- [ ] implement strategies in C++
+
+## Todo
+### Gateway/API
+- [ ] handle TWS connection interruption e.g. reconnect and get order status

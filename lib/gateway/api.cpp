@@ -7,6 +7,7 @@
 
 #include "api.h"
 #include "objects/objects.h"
+#include "objects/enums.h"
 #include "utils/utils.h"
 
 
@@ -34,7 +35,6 @@ namespace calm {
             running = true;
             cb_thread = std::thread(&IBApi::process_messages, this);
             while (order_id < 0) std::this_thread::sleep_for(std::chrono::milliseconds(1));
-            std::cout << "reached" << std::endl;
         }
     }
 
@@ -91,7 +91,7 @@ namespace calm {
         }
         {
             std::lock_guard lock{tick_m};
-            ticks[symbol] = Tick{symbol};
+            ticks[symbol] = TickData{symbol};
         }
 
         ++req_id;
@@ -112,7 +112,7 @@ namespace calm {
             if (!req_id2sym.contains(req_id)) return;
             symbol = req_id2sym[req_id];
         }
-        Tick tick;
+        TickData tick;
         {
             std::lock_guard lock{tick_m};
             auto &tick_ = ticks[symbol];
@@ -138,7 +138,7 @@ namespace calm {
             if (!req_id2sym.contains(req_id)) return;
             symbol = req_id2sym[req_id];
         }
-        Tick tick;
+        TickData tick;
         {
             std::lock_guard lock{tick_m};
             auto &tick_ = ticks[symbol];
@@ -163,9 +163,9 @@ namespace calm {
         }
     }
 
-    void IBApi::nextValidId(OrderId order_id) {
-        gateway.logger->info("In nextValidId: updating order_id to {}", order_id);
-        this->order_id = order_id;
+    void IBApi::nextValidId(OrderId order_id_) {
+        gateway.logger->info("In nextValidId: updating order_id to {}", order_id_);
+        order_id = order_id_;
     }
 
     bool IBApi::is_connected() const {
@@ -189,17 +189,22 @@ namespace calm {
         return order_id;
     }
 
-    OrderId IBApi::send_order(const std::string &symbol, const std::string &direction, double quantity, double limit_price) {
-        auto contract = generate_contract(symbol);
-        Order order;
-        order.action = direction;
-        order.orderType = "LMT";
-        order.totalQuantity = doubleToDecimal(quantity);
-        order.lmtPrice = limit_price;
-        order.tif = "DAY";
 
+    OrderId IBApi::send_order(calm::OrderReq const & order_req) {
+        auto contract = generate_contract(order_req.symbol);
+        if (!order_req.exchange.empty()) contract.exchange = order_req.exchange;
+
+        auto order = generate_ib_order(order_req);
+        OrderData order_data{order_id, order_req.symbol, order_req.exchange, order_req.order_type, order_req.action,
+                             order_req.quantity};
+
+        {
+            std::lock_guard lock{orders_m};
+            orders[order_id] = order_data;
+        }
         m_pClient->placeOrder(order_id++, contract, order);
         return order_id - 1;
+
     }
 
     void IBApi::openOrder(OrderId order_id_, const Contract &contract, const Order &order, const OrderState &order_state) {
@@ -214,6 +219,20 @@ namespace calm {
                              "permId:{}, parentId:{}, lastFillPrice:{}, clientId:{}, whyHeld:{}, mktCapPrice:{}",
                              orderId, status, decimalToDouble(filled), decimalToDouble(remaining), avgFillPrice, permId,
                              parentId, lastFillPrice, clientId, whyHeld, mktCapPrice);
+    }
+
+
+    Order IBApi::generate_ib_order(OrderReq const & order_req) {
+
+
+        Order order;
+        order.action = action_to_ib[order_req.action];
+        order.totalQuantity = doubleToDecimal(order_req.quantity);
+        order.orderType = order_type_to_ib[order_req.order_type];
+        if (order_req.order_type == OrderType::LIMIT) order.lmtPrice = order_req.price;
+
+        order.tif = "DAY";
+        return order;
     }
 
 }

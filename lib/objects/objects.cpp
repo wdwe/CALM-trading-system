@@ -78,10 +78,15 @@ namespace calm {
 
 
 
-    // Tick
-    std::string to_string(Tick const &tick) {
-        return fmt::format("Tick(symbol:{}, last_price:{}, last_size:{}, bid_price:{}, bid_size:{}, ask_price:{}, ask_size:{}, timestamp:{})",
+    // TickData
+    std::string to_string(TickData const &tick) {
+        return fmt::format("TickData(symbol:{}, last_price:{}, last_size:{}, bid_price:{}, bid_size:{}, ask_price:{}, ask_size:{}, timestamp:{})",
                            tick.symbol, tick.last_price, tick.last_size, tick.bid_price, tick.bid_size, tick.ask_price, tick.ask_size, tick.timestamp);
+    }
+
+    // OrderData
+    std::string to_string(OrderData const & order_data) {
+        return fmt::format("OrderData(placeholder)");
     }
 
 }

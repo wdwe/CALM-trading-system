@@ -5,6 +5,8 @@ add_library(calm
         utils/logging.cpp
         utils/utils.cpp
         objects/objects.cpp
+        objects/enums.cpp
+        objects/constants.h
 )
 
 target_link_libraries(calm

@@ -40,7 +40,7 @@ namespace calm {
 
         // order
         OrderId get_order_id() const;
-        OrderId send_order(std::string const &symbol, std::string const &direction, double size, double limit_price);
+        OrderId send_order(OrderReq const & order_req);
         void openOrder(OrderId order_id_, Contract const& contract, Order const &order, OrderState const& order_state);
         void orderStatus(OrderId orderId, const std::string& status, Decimal filled, Decimal remaining,
                          double avgFillPrice, int permId, int parentId, double lastFillPrice, int clientId,
@@ -68,11 +68,15 @@ namespace calm {
         // market data subscription
         std::mutex tick_m;
         std::mutex req_m;
-        std::unordered_map<std::string, Tick> ticks;
+        std::unordered_map<std::string, TickData> ticks;
         std::unordered_map<std::string, std::pair<int, int>> sym2req_ids;
         std::unordered_map<int, std::string> req_id2sym;
 
+        // order
+        static Order generate_ib_order(OrderReq const& order_req);
         OrderId order_id{-1};
+        std::mutex orders_m;
+        std::unordered_map<OrderId, OrderData> orders;
 
 
     };

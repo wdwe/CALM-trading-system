@@ -4,11 +4,19 @@
 #include <string>
 #include <chrono>
 #include <iostream>
+#include <limits>
 
 #include "Contract.h"
 #include "OrderState.h"
+#include "Order.h"
+#include "enums.h"
+#include "constants.h"
 
 namespace calm {
+    typedef long OrderId;
+/*
+ * tws api
+ */
     // Contract
     std::string to_string(Contract const& contract);
     // ContractDetails
@@ -18,7 +26,12 @@ namespace calm {
     // Order
     std::string to_string(Order const &order);
 
-    struct Tick {
+
+/*
+ * calm trading
+ */
+    // Tick
+    struct TickData {
         std::string symbol;
         double last_price{0};
         double last_size{0};
@@ -28,7 +41,39 @@ namespace calm {
         double ask_size{0};
         time_t timestamp{0};
     };
-    std::string to_string(Tick const & tick);
+    std::string to_string(TickData const & tick);
+
+    // Order
+    struct OrderReq {
+        std::string symbol;
+        std::string exchange;
+        Action action;
+        OrderType order_type;
+        double quantity;
+        double price{UnsetDouble};
+    };
+
+    struct OrderUpdateReq {
+        OrderId order_id;
+        std::string symbol;
+        double quantity{UnsetDouble};
+        double price{UnsetDouble};
+    };
+
+
+    struct OrderData {
+        OrderId order_id;
+        std::string symbol;
+        std::string exchange;
+
+        OrderType order_type;
+        Action action;
+        double total_quantity;
+        double traded_quantity{0};
+        double avg_trade_price{0};
+        OrderStatus status{OrderStatus::PENDING_SUBMIT};
+    };
+    std::string to_string(OrderData const & order_data);
 
 
 }

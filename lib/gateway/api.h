@@ -45,6 +45,13 @@ namespace calm {
         void orderStatus(OrderId orderId, const std::string& status, Decimal filled, Decimal remaining,
                          double avgFillPrice, int permId, int parentId, double lastFillPrice, int clientId,
                          const std::string& whyHeld, double mktCapPrice);
+        void cancel_order(OrderId order_id);
+        void cancel_all_orders();
+
+        // contract
+        void req_contract_details(std::string const & symbol);
+        void contractDetails(int req_id, ContractDetails const & details);
+        void contractDetailsEnd(int req_id);
 
     private:
         static Contract generate_contract(std::string const &symbol);
@@ -64,7 +71,7 @@ namespace calm {
         bool running{false};
         std::thread cb_thread;
 
-        int req_id{0};
+        int req_id{10'000'000};  // req_id is set be different from order_id
         // market data subscription
         std::mutex tick_m;
         std::mutex req_m;
@@ -75,6 +82,8 @@ namespace calm {
         // order
         static Order generate_ib_order(OrderReq const& order_req);
         OrderId order_id{-1};
+        std::mutex order_req_m;
+        std::unordered_map<OrderId, OrderReq> order_reqs;
         std::mutex orders_m;
         std::unordered_map<OrderId, OrderData> orders;
 

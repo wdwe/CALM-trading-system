@@ -30,6 +30,16 @@ namespace calm {
 /*
  * calm trading
  */
+    // Message
+    struct ErrMsg {
+        int id;
+        int error_code;
+        std::string message;
+        std::string order_rejection_json;
+    };
+    std::string to_string(ErrMsg const & err_msg);
+
+
     // Tick
     struct TickData {
         std::string symbol;
@@ -51,6 +61,7 @@ namespace calm {
         OrderType order_type;
         double quantity;
         double price{UnsetDouble};
+        OrderId order_id{UnsetLong}; // set to modify order
     };
 
     struct OrderUpdateReq {
@@ -71,9 +82,13 @@ namespace calm {
         double total_quantity;
         double traded_quantity{0};
         double avg_trade_price{0};
+        double commission{0};
         OrderStatus status{OrderStatus::PENDING_SUBMIT};
+        int error_code{0};
     };
     std::string to_string(OrderData const & order_data);
+
+
 
 
 }

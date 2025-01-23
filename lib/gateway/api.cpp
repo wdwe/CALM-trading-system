@@ -48,21 +48,16 @@ namespace calm {
 
 
     bool IBApi::connect(const char *host, int port, int client_id) {
-        // trying to connect
-        printf( "Connecting to %s:%d clientId:%d\n", !( host && *host) ? "127.0.0.1" : host, port, client_id);
-
-        //! [connect]
+        gateway.logger->info("Connecting to {}:{} clientId:{}", !( host && *host) ? "127.0.0.1": host, port, client_id);
         bool bRes = m_pClient->eConnect( host, port, client_id, m_extraAuth);
-        //! [connect]
 
         if (bRes) {
-            printf( "Connected to %s:%d clientId:%d\n", m_pClient->host().c_str(), m_pClient->port(), client_id);
-            //! [ereader]
+            gateway.logger->info("Connected to {}:{} clientId:{}", m_pClient->host().c_str(), m_pClient->port(), client_id);
             m_pReader = std::make_unique<EReader>( m_pClient, &m_osSignal );
             m_pReader->start();
-            //! [ereader]
         } else {
             printf("Cannot connect to %s:%d clientId:%d\n", m_pClient->host().c_str(), m_pClient->port(), client_id);
+            gateway.logger->error("Cannot connect to {}:{} clientId:{}", m_pClient->host().c_str(), m_pClient->port(), client_id);
         }
         return bRes;
     }
@@ -85,19 +80,17 @@ namespace calm {
 
         {
             std::lock_guard lock{req_m};
-            sym2req_ids[symbol] = {req_id + 1, req_id + 2};
+            sym2req_ids[symbol] = {req_id, req_id + 1};
+            req_id2sym[req_id] = symbol;
             req_id2sym[req_id + 1] = symbol;
-            req_id2sym[req_id + 2] = symbol;
         }
         {
             std::lock_guard lock{tick_m};
             ticks[symbol] = TickData{symbol};
         }
 
-        ++req_id;
-        m_pClient->reqTickByTickData(req_id, contract, "Last", 10, false);
-        ++req_id;
-        m_pClient->reqTickByTickData(req_id, contract, "BidAsk", 10, false);
+        m_pClient->reqTickByTickData(req_id++, contract, "Last", 10, false);
+        m_pClient->reqTickByTickData(req_id++, contract, "BidAsk", 10, false);
 
     }
 
@@ -151,8 +144,15 @@ namespace calm {
     }
 
     void IBApi::error(int id, int errorCode, std::string const &errorString, std::string const &advancedOrderRejectJson) {
-        gateway.logger->warn("id:{} errorCode:{} errorMsg:{} advancedOrderRejectionJson:{}", id, errorCode, errorString, advancedOrderRejectJson);
-//        std::cout << "id:" << id << " errorCode: " << errorCode << " errorMsg: " << errorString << " advancedOrderRejectJson: " << advancedOrderRejectJson << std::endl;
+        ErrMsg err_msg{id, errorCode, errorString, advancedOrderRejectJson};
+        gateway.logger->warn("{}", to_string(err_msg));
+
+        {
+            std::lock_guard lock{orders_m};
+            if (orders.contains(id)) {
+                orders[id].error_code = errorCode;
+            }
+        }
     }
 
     void IBApi::process_messages() {
@@ -194,37 +194,61 @@ namespace calm {
         auto contract = generate_contract(order_req.symbol);
         if (!order_req.exchange.empty()) contract.exchange = order_req.exchange;
 
+        OrderId order_id_ = is_unset_llong(order_req.order_id)? order_id++: order_req.order_id;
         auto order = generate_ib_order(order_req);
-        OrderData order_data{order_id, order_req.symbol, order_req.exchange, order_req.order_type, order_req.action,
+        OrderData order_data{order_id_, order_req.symbol, order_req.exchange, order_req.order_type, order_req.action,
                              order_req.quantity};
 
         {
             std::lock_guard lock{orders_m};
-            orders[order_id] = order_data;
+            if (!orders.contains(order_id_)) orders[order_id_] = order_data;
         }
-        m_pClient->placeOrder(order_id++, contract, order);
-        return order_id - 1;
+        m_pClient->placeOrder(order_id_, contract, order);
+        return order_id_;
 
     }
 
     void IBApi::openOrder(OrderId order_id_, const Contract &contract, const Order &order, const OrderState &order_state) {
         gateway.logger->info("In openOrder: contract:{}, order:{}, order_state:{}", to_string(contract), to_string(order), to_string(order_state));
+        double commission = order_state.commission;
+        if (!is_unset_double(commission)) {
+            std::lock_guard lock{orders_m};
+            if (!orders.contains(order_id_)) {
+                gateway.logger->warn("OrderId {} is not found in this->orders", order_id_);
+                return;
+            }
+            orders[order_id_].commission = commission;
+        }
 
     }
 
     void IBApi::orderStatus(OrderId orderId, const std::string& status, Decimal filled, Decimal remaining,
                             double avgFillPrice, int permId, int parentId, double lastFillPrice, int clientId,
-                            const std::string& whyHeld, double mktCapPrice){
+                            const std::string& whyHeld, double mktCapPrice) {
         gateway.logger->info("In orderStatus: orderId:{}, status:{}, filled:{}, remaining:{}, avgFillPrice:{}, "
                              "permId:{}, parentId:{}, lastFillPrice:{}, clientId:{}, whyHeld:{}, mktCapPrice:{}",
                              orderId, status, decimalToDouble(filled), decimalToDouble(remaining), avgFillPrice, permId,
                              parentId, lastFillPrice, clientId, whyHeld, mktCapPrice);
+
+        OrderStatus status_ = order_status_to_calm[status];
+        double filled_ = decimalToDouble(filled);
+
+        {
+            std::lock_guard lock{orders_m};
+            if (!orders.contains(orderId)) {
+                gateway.logger->warn("OrderId {} is not found in this->orders", orderId);
+                return;
+            }
+            auto &order_data = orders[orderId];
+            order_data.status = status_;
+            order_data.traded_quantity = filled_;
+            order_data.avg_trade_price = avgFillPrice;
+        }
+
     }
 
 
     Order IBApi::generate_ib_order(OrderReq const & order_req) {
-
-
         Order order;
         order.action = action_to_ib[order_req.action];
         order.totalQuantity = doubleToDecimal(order_req.quantity);
@@ -233,6 +257,27 @@ namespace calm {
 
         order.tif = "DAY";
         return order;
+    }
+
+    void IBApi::req_contract_details(const std::string &symbol) {
+        Contract contract = generate_contract(symbol);
+        m_pClient->reqContractDetails(req_id++, contract);
+    }
+
+    void IBApi::contractDetails(int req_id, const ContractDetails &details) {
+        gateway.logger->info("req_id:{}, details:{}", req_id, to_string(details));
+    }
+
+    void IBApi::contractDetailsEnd(int req_id) {
+        gateway.logger->info("req_id:{}, contractDetailsEnd", req_id);
+    }
+
+    void IBApi::cancel_order(OrderId order_id_) {
+        m_pClient->cancelOrder(order_id_, "");
+    }
+
+    void IBApi::cancel_all_orders() {
+        m_pClient->reqGlobalCancel();
     }
 
 }

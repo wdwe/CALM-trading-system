@@ -2,6 +2,9 @@
 #include "fmt/format.h"
 
 namespace calm {
+/*
+ * IB
+ */
     // Contract
     std::string to_string(Contract const& contract) {
          return fmt::format(
@@ -76,6 +79,14 @@ namespace calm {
                            order.trailStopPrice, order.trailingPercent);
     }
 
+/*
+ * CALM trading
+ */
+    // Message
+    std::string to_string(ErrMsg const & err_msg) {
+        return fmt::format("ErrMsg(id:{}, error_code:{}, message:{}, order_rejection_json:{})",
+                              err_msg.id, err_msg.error_code, err_msg.message, err_msg.order_rejection_json);
+    }
 
 
     // TickData

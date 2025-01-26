@@ -20,6 +20,7 @@ Below are some pointers for future/next iteration.
 - [ ] for hot path, use stack instead of heap storage (i.e. use `std::move` syntax with queue instead of creating shared
   pointer)
 - [ ] use shared memory instead of message queue to bridge execution system and algo/strategy program
+- [ ] replace the use of `string` with `char[]`/`string_view`/`inplace_string` 
 - [ ] use more `curiously recurring template pattern` to speed up
 - [ ] implement strategies in C++
 

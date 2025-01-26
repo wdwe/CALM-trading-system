@@ -1,5 +1,5 @@
 #include "gateway/api.h"
-#include "core/event_engine.h"
+#include "core/event.h"
 #include "gateway/gateway.h"
 #include "fmt/format.h"
 #include <iostream>
@@ -24,15 +24,15 @@ int main() {
     auto host = "";
     int port = 7497;
     api.start(host, port, 0);
-//    api.subscribe("USD-CASH-SGD.IDEALPRO", false);// 6758-STK-JPY.TSEJ ETH-CRYPTO-USD.PAXOS USD-CASH-SGD.IDEALPRO 1810-FUT-HKD.HKFE
+    api.subscribe("USD-CASH-SGD.IDEALPRO", false);// 6758-STK-JPY.TSEJ ETH-CRYPTO-USD.PAXOS USD-CASH-SGD.IDEALPRO 1810-FUT-HKD.HKFE
 
 /*
  * Order
  */
-    OrderReq req{"ADS-STK-EUR.SMART", "SMART", Action::BUY, OrderType::LIMIT, 10, 200};
+//    OrderReq req{"ADS-STK-EUR.SMART", "SMART", Action::BUY, OrderType::LIMIT, 10, 200};
 //    OrderId id = api.send_order(req);
 //    logger->info("Order id is {}", id);
-    api.cancel_order(21);
+//    api.cancel_order(21);
 //    OrderReq req_1{"1810-STK-HKD.SEHK", "SEHK", Action::BUY, OrderType::LIMIT, 400, 36, 19};
 //    OrderId id_1 = api.send_order(req_1);
 //    logger->info("OrderId is {}", id_1);

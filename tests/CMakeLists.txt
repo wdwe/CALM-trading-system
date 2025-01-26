@@ -1,3 +1,5 @@
 add_subdirectory(TestCppClient)
 add_subdirectory(quick_test)
 add_subdirectory(gateway)
+add_subdirectory(utils)
+add_subdirectory(core)

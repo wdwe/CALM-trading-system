@@ -62,6 +62,20 @@ namespace calm {
     extern std::unordered_map<std::string, OrderStatus> order_status_to_calm;
 
 
+    enum class EventType {
+        // event engine
+        EVENT_ENGINE_STOP,
+
+        // testing
+        EVENT_ENGINE_TEST,
+        EVENT_ENGINE_TEST_1,
+
+        // IB gateway
+        TICK_DATA,
+        ORDER_DATA,
+        IB_ERR_MSG
+    };
+
 }
 
 

@@ -1,9 +1,10 @@
 add_library(calm
-        core/event_engine.cpp
+        core/event.cpp
         gateway/api.cpp
         gateway/gateway.cpp
         utils/logging.cpp
         utils/utils.cpp
+        utils/lock_based_queue.h
         objects/objects.cpp
         objects/enums.cpp
         objects/constants.h

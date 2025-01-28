@@ -54,7 +54,7 @@ namespace calm {
         while (running) {
             Event event;
             if(q.try_pop(event, 1'000'000)) {
-                if (event.e_type == EventType::EVENT_ENGINE_STOP) {
+                if (event.e_type == EventType::event_engine_stop) {
                     logger->info("In run - received EVENT_ENGINE_STOP, stopping event engine.");
                     {
                         std::lock_guard lock{m};

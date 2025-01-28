@@ -8,36 +8,56 @@
 #include "utils/logging.h"
 #include "objects/objects.h"
 #include "objects/enums.h"
+#include "spdlog/spdlog.h"
 
 
 using namespace std::chrono_literals;
+using namespace calm;
+
+void print_event(Event const& event) {
+    if (event.e_type == EventType::tick_data) {
+        auto data = std::static_pointer_cast<TickData>(event.data);
+        std::cout << to_string(*data) << std::endl;
+    } else if (event.e_type == EventType::order_data) {
+        auto data = std::static_pointer_cast<OrderData>(event.data);
+        std::cout << to_string(*data) << std::endl;
+    }
+}
+
+
 
 int main() {
-    using namespace calm;
-
-    auto logger = init_root_logger("test.log");
+    auto logger = init_root_logger("test.log", spdlog::level::debug);
     logger->info("test_ib_api");
 
     EventEngine event_engine;
     IBGateway gateway{event_engine};
     IBApi api{gateway};
+
+    event_engine.register_cb(EventType::order_data, "print_event", print_event);
+    event_engine.register_cb(EventType::tick_data, "print_event", print_event);
+
+    event_engine.start();
+
     auto host = "";
     int port = 7497;
-    api.start(host, port, 0);
+    int client_id{0};
+    api.start(host, port, client_id);
+
     api.subscribe("USD-CASH-SGD.IDEALPRO", false);// 6758-STK-JPY.TSEJ ETH-CRYPTO-USD.PAXOS USD-CASH-SGD.IDEALPRO 1810-FUT-HKD.HKFE
 
 /*
  * Order
  */
-//    OrderReq req{"ADS-STK-EUR.SMART", "SMART", Action::BUY, OrderType::LIMIT, 10, 200};
+//    OrderReq req{"ADS-STK-EUR.SMART", "SMART", Action::buy, OrderType::limit, 10, 200};
 //    OrderId id = api.send_order(req);
 //    logger->info("Order id is {}", id);
 //    api.cancel_order(21);
-//    OrderReq req_1{"1810-STK-HKD.SEHK", "SEHK", Action::BUY, OrderType::LIMIT, 400, 36, 19};
+//    OrderReq req_1{"1810-STK-HKD.SEHK", "SEHK", Action::buy, OrderType::limit, 400, 36, 19};
 //    OrderId id_1 = api.send_order(req_1);
 //    logger->info("OrderId is {}", id_1);
-//    api.send_order("USD-CASH-SGD.IDEALPRO", "BUY", 200, 1.359);
-//    api.send_order("ETH-CRYPTO-USD.PAXOS", "BUY", 0.012, 3120);
+//    api.send_order("USD-CASH-SGD.IDEALPRO", "buy", 200, 1.359);
+//    api.send_order("ETH-CRYPTO-USD.PAXOS", "buy", 0.012, 3120);
 /*
  * Contract Details
  */

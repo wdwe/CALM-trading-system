@@ -10,7 +10,8 @@
 #include <memory>
 
 namespace calm {
-    std::shared_ptr<spdlog::async_logger> init_root_logger(std::string const &logfile_path);
+    std::shared_ptr<spdlog::async_logger> init_root_logger(std::string const &logfile_path,
+                                                           spdlog::level::level_enum const& level=spdlog::level::info);
 
     std::shared_ptr<spdlog::async_logger> init_sub_logger(std::string const &name);
 

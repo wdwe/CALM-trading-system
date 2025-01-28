@@ -83,7 +83,7 @@ namespace calm {
         double traded_quantity{0};
         double avg_trade_price{0};
         double commission{0};
-        OrderStatus status{OrderStatus::PENDING_SUBMIT};
+        OrderStatus status{OrderStatus::pending_submit};
         int error_code{0};
     };
     std::string to_string(OrderData const & order_data);

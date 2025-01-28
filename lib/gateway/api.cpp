@@ -116,7 +116,8 @@ namespace calm {
             tick_.timestamp = time;
             tick = tick_;
         }
-        gateway.logger->info(to_string(tick));
+        gateway.logger->debug(to_string(tick));
+        gateway.on_tick(tick);
     }
 
     void IBApi::tickByTickAllLast(int req_id, int tick_type, time_t time, double price, Decimal size,
@@ -140,19 +141,28 @@ namespace calm {
             tick_.timestamp = time;
             tick = tick_;
         }
-        gateway.logger->info(to_string(tick));
+        gateway.logger->debug(to_string(tick));
+        gateway.on_tick(tick);
     }
 
     void IBApi::error(int id, int errorCode, std::string const &errorString, std::string const &advancedOrderRejectJson) {
         ErrMsg err_msg{id, errorCode, errorString, advancedOrderRejectJson};
         gateway.logger->warn("{}", to_string(err_msg));
+        gateway.on_error(err_msg);
+
+        OrderData order_data;
+        bool order_flag{false};
 
         {
             std::lock_guard lock{orders_m};
             if (orders.contains(id)) {
                 orders[id].error_code = errorCode;
+                order_data = orders[id];
+                order_flag = true;
             }
         }
+        if (order_flag) gateway.on_order(order_data);
+
     }
 
     void IBApi::process_messages() {
@@ -199,25 +209,35 @@ namespace calm {
         OrderData order_data{order_id_, order_req.symbol, order_req.exchange, order_req.order_type, order_req.action,
                              order_req.quantity};
 
+        bool order_flag{false};
         {
             std::lock_guard lock{orders_m};
-            if (!orders.contains(order_id_)) orders[order_id_] = order_data;
+            if (!orders.contains(order_id_)) {
+                orders[order_id_] = order_data;
+                order_flag = true;
+            }
         }
+        if (order_flag) gateway.on_order(order_data);
         m_pClient->placeOrder(order_id_, contract, order);
         return order_id_;
 
     }
 
     void IBApi::openOrder(OrderId order_id_, const Contract &contract, const Order &order, const OrderState &order_state) {
-        gateway.logger->info("In openOrder: contract:{}, order:{}, order_state:{}", to_string(contract), to_string(order), to_string(order_state));
+        gateway.logger->debug("In openOrder: contract:{}, order:{}, order_state:{}", to_string(contract), to_string(order), to_string(order_state));
         double commission = order_state.commission;
         if (!is_unset_double(commission)) {
-            std::lock_guard lock{orders_m};
-            if (!orders.contains(order_id_)) {
-                gateway.logger->warn("OrderId {} is not found in this->orders", order_id_);
-                return;
+            OrderData order_data;
+            {
+                std::lock_guard lock{orders_m};
+                if (!orders.contains(order_id_)) {
+                    gateway.logger->warn("OrderId {} is not found in this->orders", order_id_);
+                    return;
+                }
+                orders[order_id_].commission = commission;
+                order_data = orders[order_id_];
             }
-            orders[order_id_].commission = commission;
+            gateway.on_order(order_data);
         }
 
     }
@@ -225,13 +245,15 @@ namespace calm {
     void IBApi::orderStatus(OrderId orderId, const std::string& status, Decimal filled, Decimal remaining,
                             double avgFillPrice, int permId, int parentId, double lastFillPrice, int clientId,
                             const std::string& whyHeld, double mktCapPrice) {
-        gateway.logger->info("In orderStatus: orderId:{}, status:{}, filled:{}, remaining:{}, avgFillPrice:{}, "
+        gateway.logger->debug("In orderStatus: orderId:{}, status:{}, filled:{}, remaining:{}, avgFillPrice:{}, "
                              "permId:{}, parentId:{}, lastFillPrice:{}, clientId:{}, whyHeld:{}, mktCapPrice:{}",
                              orderId, status, decimalToDouble(filled), decimalToDouble(remaining), avgFillPrice, permId,
                              parentId, lastFillPrice, clientId, whyHeld, mktCapPrice);
 
         OrderStatus status_ = order_status_to_calm[status];
         double filled_ = decimalToDouble(filled);
+
+        OrderData order_data_;
 
         {
             std::lock_guard lock{orders_m};
@@ -243,8 +265,10 @@ namespace calm {
             order_data.status = status_;
             order_data.traded_quantity = filled_;
             order_data.avg_trade_price = avgFillPrice;
+            order_data_ = order_data;
         }
 
+        gateway.on_order(order_data_);
     }
 
 
@@ -253,7 +277,7 @@ namespace calm {
         order.action = action_to_ib[order_req.action];
         order.totalQuantity = doubleToDecimal(order_req.quantity);
         order.orderType = order_type_to_ib[order_req.order_type];
-        if (order_req.order_type == OrderType::LIMIT) order.lmtPrice = order_req.price;
+        if (order_req.order_type == OrderType::limit) order.lmtPrice = order_req.price;
 
         order.tif = "DAY";
         return order;

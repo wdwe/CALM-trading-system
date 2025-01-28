@@ -19,11 +19,11 @@ class Printer {
 public:
     explicit Printer(calm::EventEngine &event_engine): event_engine{event_engine} {
         event_engine.register_cb(
-                calm::EventType::EVENT_ENGINE_TEST, "printer",
+                calm::EventType::event_engine_test, "printer",
                 [this](calm::Event const& event) {this->print(event);}
                 );
         event_engine.register_cb(
-                calm::EventType::EVENT_ENGINE_TEST_1, "throw_error",
+                calm::EventType::event_engine_test_1, "throw_error",
                 [this](calm::Event const& event) {this->throw_error(event);}
                 );
     }
@@ -51,7 +51,7 @@ int main() {
     Printer p{engine};
     engine.start();
     for (int i{0}; i < 5; ++i) {
-        engine.send({EventType::EVENT_ENGINE_TEST, std::make_shared<Msg>(i, "message")});
+        engine.send({EventType::event_engine_test, std::make_shared<Msg>(i, "message")});
     }
 //    engine.send({EventType::EVENT_ENGINE_STOP});
 //    engine.wait_till_finish();
@@ -60,7 +60,7 @@ int main() {
 //    std::this_thread::sleep_for(5s);
 //    engine.stop();
 
-    engine.send({EventType::EVENT_ENGINE_TEST_1});
+    engine.send({EventType::event_engine_test_1});
     std::this_thread::sleep_for(10s);
     engine.stop();
 

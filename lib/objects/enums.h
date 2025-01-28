@@ -29,8 +29,8 @@ namespace calm {
  */
 
     enum class Action {
-            BUY,
-            SELL
+            buy,
+            sell
         };
 
     extern std::unordered_map<Action, std::string> action_to_ib;
@@ -38,8 +38,8 @@ namespace calm {
 
 
     enum class OrderType {
-        LIMIT,
-        MARKET
+        limit,
+        market
     };
 
     extern std::unordered_map<OrderType, std::string> order_type_to_ib;
@@ -47,14 +47,14 @@ namespace calm {
 
 
     enum class OrderStatus {
-        PENDING_SUBMIT,
-        PENDING_CANCEL,
-        PRE_SUBMITTED,
-        SUBMITTED,
-        API_CANCELLED,
-        CANCELLED,
-        FILLED,
-        INACTIVE
+        pending_submit,
+        pending_cancel,
+        pre_submitted,
+        submitted,
+        api_cancelled,
+        cancelled,
+        filled,
+        inactive
     };
 
 
@@ -64,16 +64,16 @@ namespace calm {
 
     enum class EventType {
         // event engine
-        EVENT_ENGINE_STOP,
+        event_engine_stop,
 
         // testing
-        EVENT_ENGINE_TEST,
-        EVENT_ENGINE_TEST_1,
+        event_engine_test,
+        event_engine_test_1,
 
         // IB gateway
-        TICK_DATA,
-        ORDER_DATA,
-        IB_ERR_MSG
+        tick_data,
+        order_data,
+        ib_err_msg
     };
 
 }

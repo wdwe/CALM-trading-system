@@ -104,6 +104,16 @@ namespace calm {
     public:
         IBGateway(EventEngine &event_engine);
 
+        void start(const char *host="", int port=7497, int client_id=0);
+        void stop();
+        void subscribe(std::string const & symbol, bool delayed);
+        OrderId send_order(OrderReq const & order_req);
+        void cancel_order(OrderId order_id);
+        void cancel_all_orders();
+        void req_contract_details(std::string const & symbol);
+        int req_historical_bar(std::string const &symbol, std::string const& end_time, std::string const & duration,
+                               std::string const &bar_size, std::string const &wts, int use_rth, int format);
+
         void on_event(Event const & event);
         void on_error(ErrMsg const & err_msg);
         void on_event(Event&& event);

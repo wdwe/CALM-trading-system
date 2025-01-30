@@ -342,6 +342,41 @@ namespace calm {
         logger = init_sub_logger("ib_gateway");
     }
 
+    void IBGateway::start(const char *host, int port, int client_id) {
+        api.start(host, port, client_id);
+    }
+
+    void IBGateway::stop() {
+        api.stop();
+    }
+
+
+    void IBGateway::subscribe(const std::string &symbol, bool delayed) {
+        return api.subscribe(symbol, delayed);
+    }
+
+    OrderId IBGateway::send_order(const calm::OrderReq &order_req) {
+        return api.send_order(order_req);
+    }
+
+    void IBGateway::cancel_order(calm::OrderId order_id) {
+        api.cancel_order(order_id);
+    }
+
+    void IBGateway::cancel_all_orders() {
+        api.cancel_all_orders();
+    }
+
+    void IBGateway::req_contract_details(const std::string &symbol) {
+        api.req_contract_details(symbol);
+    }
+
+    int IBGateway::req_historical_bar(const std::string &symbol, const std::string &end_time,
+                                      const std::string &duration, const std::string &bar_size, const std::string &wts,
+                                      int use_rth, int format) {
+        return api.req_historical_bar(symbol, end_time, duration, bar_size, wts, use_rth, format);
+    }
+
     void IBGateway::on_event(calm::Event const & event) {
         event_engine.send(event);
     }

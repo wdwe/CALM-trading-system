@@ -36,7 +36,7 @@ int main() {
 
     EventEngine event_engine;
     IBGateway gateway{event_engine};
-    IBApi api{gateway};
+//    IBApi api{gateway};
 
     std::vector<EventType> event_types{
             EventType::order_data, EventType::tick_data, EventType::hist_bar, EventType::hist_bar_end
@@ -51,8 +51,8 @@ int main() {
     auto host = "";
     int port = 7497;
     int client_id{0};
-    api.start(host, port, client_id);
-
+//    api.start(host, port, client_id);
+    gateway.start(host, port, client_id);
 /*
  * Live Data Subscription
  */
@@ -79,13 +79,13 @@ int main() {
 /*
  *  Historical Data
  */
-    api.req_historical_bar("6758-STK-JPY.SMART", "20250129 14:20:31 Asia/Singapore", "1800 S", "5 secs", "TRADES", 1, 1);
+    gateway.req_historical_bar("6758-STK-JPY.SMART", "20250129 14:20:31 Asia/Singapore", "1800 S", "5 secs", "TRADES", 1, 1);
 
 
 
     while (true) {
         std::this_thread::sleep_for(1ms);
     }
-    api.stop();
+    gateway.stop();
     return 0;
 }

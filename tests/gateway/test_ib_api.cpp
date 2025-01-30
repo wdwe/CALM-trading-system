@@ -1,7 +1,5 @@
-#include "gateway/api.h"
 #include "core/event.h"
 #include "gateway/gateway.h"
-#include "fmt/format.h"
 #include <iostream>
 #include <thread>
 #include <chrono>
@@ -81,7 +79,7 @@ int main() {
 /*
  *  Historical Data
  */
-    api.req_historical_bar("6758-STK-JPY.SMART", "20250129 14:20:31 Asia/Singapore", "2 D", "5 secs", "TRADES", 1, 1);
+    api.req_historical_bar("6758-STK-JPY.SMART", "20250129 14:20:31 Asia/Singapore", "1800 S", "5 secs", "TRADES", 1, 1);
 
 
 

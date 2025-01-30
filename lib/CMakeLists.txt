@@ -1,6 +1,5 @@
 add_library(calm
         core/event.cpp
-        gateway/api.cpp
         gateway/gateway.cpp
         utils/logging.cpp
         utils/utils.cpp

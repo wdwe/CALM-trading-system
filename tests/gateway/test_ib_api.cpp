@@ -21,6 +21,12 @@ void print_event(Event const& event) {
     } else if (event.e_type == EventType::order_data) {
         auto data = std::static_pointer_cast<OrderData>(event.data);
         std::cout << to_string(*data) << std::endl;
+    } else if (event.e_type == EventType::hist_bar) {
+        auto data = std::static_pointer_cast<HistBar>(event.data);
+        std::cout << to_string(*data) << std::endl;
+    } else if (event.e_type == EventType::hist_bar_end) {
+        auto data = std::static_pointer_cast<HistBarEnd>(event.data);
+        std::cout << to_string(*data) << std::endl;
     }
 }
 
@@ -34,8 +40,13 @@ int main() {
     IBGateway gateway{event_engine};
     IBApi api{gateway};
 
-    event_engine.register_cb(EventType::order_data, "print_event", print_event);
-    event_engine.register_cb(EventType::tick_data, "print_event", print_event);
+    std::vector<EventType> event_types{
+            EventType::order_data, EventType::tick_data, EventType::hist_bar, EventType::hist_bar_end
+    };
+
+    for (auto t: event_types) {
+        event_engine.register_cb(t, "print_event", print_event);
+    }
 
     event_engine.start();
 
@@ -44,7 +55,10 @@ int main() {
     int client_id{0};
     api.start(host, port, client_id);
 
-    api.subscribe("USD-CASH-SGD.IDEALPRO", false);// 6758-STK-JPY.TSEJ ETH-CRYPTO-USD.PAXOS USD-CASH-SGD.IDEALPRO 1810-FUT-HKD.HKFE
+/*
+ * Live Data Subscription
+ */
+//    api.subscribe("USD-CASH-SGD.IDEALPRO", false);// 6758-STK-JPY.TSEJ ETH-CRYPTO-USD.PAXOS USD-CASH-SGD.IDEALPRO 1810-FUT-HKD.HKFE
 
 /*
  * Order
@@ -58,10 +72,19 @@ int main() {
 //    logger->info("OrderId is {}", id_1);
 //    api.send_order("USD-CASH-SGD.IDEALPRO", "buy", 200, 1.359);
 //    api.send_order("ETH-CRYPTO-USD.PAXOS", "buy", 0.012, 3120);
+
 /*
  * Contract Details
  */
-    api.req_contract_details("6758-STK-JPY.SMART");
+//    api.req_contract_details("6758-STK-JPY.SMART");
+
+/*
+ *  Historical Data
+ */
+    api.req_historical_bar("6758-STK-JPY.SMART", "20250129 14:20:31 Asia/Singapore", "2 D", "5 secs", "TRADES", 1, 1);
+
+
+
     while (true) {
         std::this_thread::sleep_for(1ms);
     }

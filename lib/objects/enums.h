@@ -73,7 +73,9 @@ namespace calm {
         // IB gateway
         tick_data,
         order_data,
-        ib_err_msg
+        ib_err_msg,
+        hist_bar,
+        hist_bar_end
     };
 
 }

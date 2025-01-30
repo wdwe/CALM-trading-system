@@ -23,6 +23,8 @@
 #include "gateway/gateway.h"
 
 namespace calm {
+    class IBGateway;
+
     class IBApi: public DefaultEWrapper {
     public:
         IBApi(IBGateway& gateway);
@@ -33,7 +35,7 @@ namespace calm {
         void nextValidId(OrderId order_id);
         bool is_connected() const;
 
-        // market dta subscription
+        // market data subscription
         void subscribe(std::string const & symbol, bool delayed);
         void tickByTickBidAsk(int req_id, time_t time, double bid_price, double ask_price, Decimal bid_size, Decimal ask_size, TickAttribBidAsk const & tick_attrib_bid_ask);
         void tickByTickAllLast(int req_id, int tick_type, time_t time, double price, Decimal size, const TickAttribLast& tick_attrib_last, std::string const & exchange, std::string const & special_conditions);
@@ -53,6 +55,12 @@ namespace calm {
         void contractDetails(int req_id, ContractDetails const & details);
         void contractDetailsEnd(int req_id);
 
+        // historical data
+        int req_historical_bar(std::string const &symbol, std::string const& end_time, std::string const & duration,
+                                std::string const &bar_size, std::string const &wts, int use_rth, int format);
+        void historicalData(TickerId req_iq, Bar const& bar);
+        void historicalDataEnd(int req_id, std::string const& start_str, std::string const& end_str);
+
     private:
         static Contract generate_contract(std::string const &symbol);
         bool connect(const char *host, int port, int client_id);
@@ -71,7 +79,7 @@ namespace calm {
         bool running{false};
         std::thread cb_thread;
 
-        int req_id{10'000'000};  // req_id is set be different from order_id
+        int m_req_id{10'000'000};  // req_id is set be different from order_id
         // market data subscription
         std::mutex tick_m;
         std::mutex req_m;
@@ -81,12 +89,11 @@ namespace calm {
 
         // order
         static Order generate_ib_order(OrderReq const& order_req);
-        OrderId order_id{-1};
+        OrderId m_order_id{-1};
         std::mutex order_req_m;
         std::unordered_map<OrderId, OrderReq> order_reqs;
         std::mutex orders_m;
         std::unordered_map<OrderId, OrderData> orders;
-
 
     };
 }

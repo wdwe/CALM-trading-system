@@ -34,7 +34,7 @@ namespace calm {
         if (connect(host, port, client_id)) {
             running = true;
             cb_thread = std::thread(&IBApi::process_messages, this);
-            while (order_id < 0) std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            while (m_order_id < 0) std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
     }
 
@@ -80,17 +80,17 @@ namespace calm {
 
         {
             std::lock_guard lock{req_m};
-            sym2req_ids[symbol] = {req_id, req_id + 1};
-            req_id2sym[req_id] = symbol;
-            req_id2sym[req_id + 1] = symbol;
+            sym2req_ids[symbol] = {m_req_id, m_req_id + 1};
+            req_id2sym[m_req_id] = symbol;
+            req_id2sym[m_req_id + 1] = symbol;
         }
         {
             std::lock_guard lock{tick_m};
             ticks[symbol] = TickData{symbol};
         }
 
-        m_pClient->reqTickByTickData(req_id++, contract, "Last", 10, false);
-        m_pClient->reqTickByTickData(req_id++, contract, "BidAsk", 10, false);
+        m_pClient->reqTickByTickData(m_req_id++, contract, "Last", 10, false);
+        m_pClient->reqTickByTickData(m_req_id++, contract, "BidAsk", 10, false);
 
     }
 
@@ -175,7 +175,7 @@ namespace calm {
 
     void IBApi::nextValidId(OrderId order_id_) {
         gateway.logger->info("In nextValidId: updating order_id to {}", order_id_);
-        order_id = order_id_;
+        m_order_id = order_id_;
     }
 
     bool IBApi::is_connected() const {
@@ -196,7 +196,7 @@ namespace calm {
     }
 
     OrderId IBApi::get_order_id() const {
-        return order_id;
+        return m_order_id;
     }
 
 
@@ -204,7 +204,7 @@ namespace calm {
         auto contract = generate_contract(order_req.symbol);
         if (!order_req.exchange.empty()) contract.exchange = order_req.exchange;
 
-        OrderId order_id_ = is_unset_llong(order_req.order_id)? order_id++: order_req.order_id;
+        OrderId order_id_ = is_unset_llong(order_req.order_id) ? m_order_id++ : order_req.order_id;
         auto order = generate_ib_order(order_req);
         OrderData order_data{order_id_, order_req.symbol, order_req.exchange, order_req.order_type, order_req.action,
                              order_req.quantity};
@@ -285,7 +285,7 @@ namespace calm {
 
     void IBApi::req_contract_details(const std::string &symbol) {
         Contract contract = generate_contract(symbol);
-        m_pClient->reqContractDetails(req_id++, contract);
+        m_pClient->reqContractDetails(m_req_id++, contract);
     }
 
     void IBApi::contractDetails(int req_id, const ContractDetails &details) {
@@ -303,6 +303,35 @@ namespace calm {
     void IBApi::cancel_all_orders() {
         m_pClient->reqGlobalCancel();
     }
+
+    int IBApi::req_historical_bar(std::string const &symbol, std::string const &end_time,
+                                   std::string const &duration, std::string const &bar_size, std::string const &wts,
+                                   int use_rth, int format) {
+        gateway.logger->debug("In req_historical_bar, req_id:{}, symbol:{}, end_time:{}, duration:{}, bar_size:{}, wts:{}, use_rth:{}, format:{}",
+                              m_req_id, symbol, end_time, duration, bar_size, wts, use_rth, format);
+        auto contract = generate_contract(symbol);
+        m_pClient->reqHistoricalData(m_req_id++, contract, end_time, duration, bar_size, wts, use_rth, format, false, TagValueListSPtr());
+        return m_req_id - 1;
+    }
+
+    void IBApi::historicalData(TickerId req_id, Bar const &bar) {
+        gateway.logger->debug("In historicalData - req_id:{}, bar:{}", req_id, to_string(bar));
+
+        HistBar bar_ {
+                req_id, bar.time, bar.high, bar.low, bar.open, bar.close,
+                decimalToDouble(bar.wap), decimalToDouble(bar.volume), bar.count
+        };
+        gateway.on_hist_bar(bar_);
+    }
+
+    void IBApi::historicalDataEnd(int req_id, std::string const &start_str, std::string const &end_str) {
+        gateway.logger->debug("In historicalDataEnd - req_id:{}, start_str:{}, end_str:{}", req_id, start_str, end_str);
+        HistBarEnd bar_end{
+            req_id, start_str, end_str
+        };
+        gateway.on_hist_bar_end(bar_end);
+    }
+
 
 }
 

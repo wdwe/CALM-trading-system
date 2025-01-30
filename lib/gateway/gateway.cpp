@@ -33,6 +33,16 @@ namespace calm {
         on_event(std::move(event));
     }
 
+    void IBGateway::on_hist_bar(HistBar const &bar) {
+        Event event{EventType::hist_bar, std::make_shared<HistBar>(bar)};
+        on_event(std::move(event));
+    }
+
+    void IBGateway::on_hist_bar_end(HistBarEnd const &bar_end) {
+        Event event{EventType::hist_bar_end, std::make_shared<HistBarEnd>(bar_end)};
+        on_event(std::move(event));
+    }
+
 
 }
 

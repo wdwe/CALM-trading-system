@@ -11,6 +11,8 @@
 #include "Order.h"
 #include "enums.h"
 #include "constants.h"
+#include "bar.h"
+
 
 namespace calm {
     typedef long OrderId;
@@ -25,6 +27,9 @@ namespace calm {
     std::string to_string(OrderState const & order_state);
     // Order
     std::string to_string(Order const &order);
+    // Bar
+    std::string to_string(Bar const &bar);
+
 
 
 /*
@@ -88,6 +93,27 @@ namespace calm {
     };
     std::string to_string(OrderData const & order_data);
 
+
+    // Historical Data
+    struct HistBar {
+        long long id;
+        std::string time;
+        double high;
+        double low;
+        double open;
+        double close;
+        double wap;
+        double volume;
+        int count;
+    };
+    std::string to_string(HistBar const &bar);
+
+    struct HistBarEnd {
+        long long id;
+        std::string start;
+        std::string end;
+    };
+    std::string to_string(HistBarEnd const& bar_end);
 
 
 

@@ -79,6 +79,13 @@ namespace calm {
                            order.trailStopPrice, order.trailingPercent);
     }
 
+    std::string to_string(Bar const &bar) {
+        return fmt::format("Bar(time:{}, high:{}, low:{}, open:{}, close:{}, wap:{}, volume:{}, count:{})",
+                           bar.time, bar.high, bar.low, bar.open, bar.close, decimalToDouble(bar.wap),
+                           decimalToDouble(bar.volume), bar.count);
+    }
+
+
 /*
  * CALM trading
  */
@@ -98,6 +105,16 @@ namespace calm {
     // OrderData
     std::string to_string(OrderData const & order_data) {
         return fmt::format("OrderData(placeholder)");
+    }
+
+    // Historical Data
+    std::string to_string(HistBar const &bar) {
+        return fmt::format("HistBar(id:{}, time:{}, high:{}, low:{}, open:{}, close:{}, wap:{}, volume:{}, count:{})",
+                           bar.id, bar.time, bar.high, bar.low, bar.open, bar.close, bar.wap, bar.volume, bar.count);
+    }
+
+    std::string to_string(HistBarEnd const& bar_end) {
+        return fmt::format("HistBarEnd(id:{}, start:{}, end:{})", bar_end.id, bar_end.start, bar_end.end);
     }
 
 }

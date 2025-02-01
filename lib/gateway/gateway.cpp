@@ -65,7 +65,7 @@ namespace calm {
 
     void IBApi::disconnect() const {
         m_pClient->eDisconnect();
-        printf ( "Disconnected\n");
+        logger->info("in disconnect - Disconnected");
     }
 
     void IBApi::subscribe(std::string const & symbol, bool delayed) {

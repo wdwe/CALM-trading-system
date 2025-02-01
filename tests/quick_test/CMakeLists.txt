@@ -12,13 +12,17 @@ add_executable(quick
 
 target_link_libraries(quick
         calm
+        tz
 )
 
 
 target_link_directories(quick
         PUBLIC ${CMAKE_BINARY_DIR}/lib
+        PUBLIC ${CMAKE_BINARY_DIR}/external/date
 )
 
 target_include_directories(quick
         PUBLIC ${CMAKE_SOURCE_DIR}/lib
+        PUBLIC ${CMAKE_SOURCE_DIR}/external/date/include
+        PUBLIC ${CMAKE_SOURCE_DIR}/external/tws/client
 )

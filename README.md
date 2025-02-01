@@ -9,6 +9,7 @@ in their own operations.
 
 ## Dependency
 - spdlog `sudo apt install libspdlog-dev`
+- Arrow (https://arrow.apache.org/install/)
 
 ## Future Performance Improvements
 While good care and efforts are given to ensure the system is efficient and high-performance, ultra-low latency is not the main

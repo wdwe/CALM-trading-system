@@ -1,0 +1,10 @@
+root_folder: "/home/wayne/calm/hist_data"
+start: 2025-01-03 00:00:00
+end: 2025-01-10 00:01:05
+timezone: UTC
+type: TRADES
+
+downloads:
+  sony: 6758-STK-JPY.TSEJ
+  toyota: 7203-STK-JPY.TSEJ
+

@@ -9,6 +9,7 @@
 #include "utils/logging.h"
 #include "spdlog/async_logger.h"
 #include <arrow/api.h>
+#include "cfg/cfg.h"
 
 namespace calm {
     struct HistBarReq {
@@ -40,9 +41,12 @@ namespace calm {
     class HistBarGetter {
     public:
         HistBarGetter(EventEngine& event_engine, IBGateway& gateway, std::vector<HistBarReq> const& reqs);
+        HistBarGetter(EventEngine& event_engine, IBGateway& gateway, std::string const& cfg_path="");
         void run();
     private:
-        std::vector<IBHistBarReq> generate_ib_reqs(HistBarReq const& bar_req, int days=1);
+        static std::vector<HistBarReq> generate_reqs(std::string const & cfg_path);
+        void init(std::vector<HistBarReq> const & reqs);
+        std::vector<IBHistBarReq> generate_ib_reqs(HistBarReq const& bar_req, int days);
         void process_hist_bar(Event const& event);
         void process_hist_bar_end(Event const& event);
         void process_err_msg(Event const& event);
@@ -64,6 +68,7 @@ namespace calm {
         std::unordered_map<TickerId, std::string> req_id_sym;
         std::size_t remaining;
         std::unordered_map<std::string, std::vector<HistBar>> sym_data;
+        Config const& m_cfg;
 
     };
 

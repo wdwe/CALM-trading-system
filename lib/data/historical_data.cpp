@@ -2,6 +2,7 @@
 
 #include <sstream>
 #include <algorithm>
+#include <filesystem>
 #include "fmt/format.h"
 #include "date/date.h"
 #include "date/tz.h"
@@ -11,6 +12,9 @@
 #include "arrow/ipc/api.h"
 #include "arrow/csv/api.h"
 #include "arrow/compute/api.h"
+#include "yaml-cpp/yaml.h"
+#include "cfg/cfg.h"
+
 
 namespace calm {
     std::string to_string(HistBarReq const& req) {
@@ -25,24 +29,21 @@ namespace calm {
 
 
     HistBarGetter::HistBarGetter(EventEngine& event_engine, IBGateway& gateway, std::vector<HistBarReq> const &reqs):
-            gateway(gateway), event_engine{event_engine}{
-        logger = init_sub_logger("hist_getter");
-        for (auto &bar_req: reqs) {
-            sym_req[bar_req.symbol] = bar_req;
+            gateway(gateway), event_engine{event_engine}, m_cfg(Config::get()) {
+        init(reqs);
+    }
 
-            auto chunks = generate_ib_reqs(bar_req, 2);
-            if (!chunks.empty()) {
-                sym_chunks[bar_req.symbol] = chunks;
-                sym_chunk_id[bar_req.symbol] = 0;
-            }
+    HistBarGetter::HistBarGetter(calm::EventEngine &event_engine, calm::IBGateway &gateway, std::string const& cfg_path):
+        gateway(gateway), event_engine{event_engine}, m_cfg(Config::get()) {
+
+        std::vector<HistBarReq> reqs;
+        if (cfg_path.empty()) {
+            reqs = generate_reqs(m_cfg.hist_default_download);
+        } else {
+            reqs = generate_reqs(cfg_path);
         }
-        remaining = sym_chunk_id.size();
 
-        // register callbacks
-        register_cb(EventType::hist_bar, "process_hist_bar", &HistBarGetter::process_hist_bar);
-        register_cb(EventType::hist_bar_end, "process_hist_bar_end", &HistBarGetter::process_hist_bar_end);
-        register_cb(EventType::ib_err_msg, "process_err_msg", &HistBarGetter::process_err_msg);
-
+        init(reqs);
     }
 
     void HistBarGetter::run() {
@@ -56,7 +57,7 @@ namespace calm {
             IBHistBarReq req;
             if (q.try_pop(req, 1000)) {
                 logger->info("in run - sending request {}", to_string(req));
-                int req_id = gateway.req_historical_bar(req.symbol, req.end, req.dur, req.bar_size, req.wts, 1, 1);
+                int req_id = gateway.req_historical_bar(req.symbol, req.end, req.dur, req.bar_size, req.wts, 1, m_cfg.hist_time_format);
                 {
                     std::lock_guard lock{req_id_m};
                     req_id_sym[req_id] = req.symbol;
@@ -66,6 +67,44 @@ namespace calm {
             }
         }
         log_status();
+
+    }
+
+
+    std::vector<HistBarReq> HistBarGetter::generate_reqs(std::string const &cfg_path) {
+        std::vector<HistBarReq> res;
+        auto cfg = YAML::LoadFile(cfg_path);
+        auto root_path = cfg["root_folder"].as<std::string>();
+        auto start = cfg["start"].as<std::string>();
+        auto end = cfg["end"].as<std::string>();
+        auto timezone = cfg["timezone"].as<std::string>();
+        auto type = cfg["type"].as<std::string>();
+        for (auto it = cfg["downloads"].begin(); it != cfg["downloads"].end(); ++it) {
+            std::string save_path = fmt::format("{}/{}-{}.csv", root_path, it->first.as<std::string>(), type);
+            auto symbol = it->second.as<std::string>();
+            res.emplace_back(symbol, start, end, timezone, type, save_path);
+        }
+        return res;
+    };
+
+
+    void HistBarGetter::init(std::vector<HistBarReq> const & reqs) {
+        logger = init_sub_logger("hist_getter");
+        for (auto &bar_req: reqs) {
+            sym_req[bar_req.symbol] = bar_req;
+
+            auto chunks = generate_ib_reqs(bar_req, m_cfg.hist_window_sz);
+            if (!chunks.empty()) {
+                sym_chunks[bar_req.symbol] = chunks;
+                sym_chunk_id[bar_req.symbol] = 0;
+            }
+        }
+        remaining = sym_chunk_id.size();
+
+        // register callbacks
+        register_cb(EventType::hist_bar, "process_hist_bar", &HistBarGetter::process_hist_bar);
+        register_cb(EventType::hist_bar_end, "process_hist_bar_end", &HistBarGetter::process_hist_bar_end);
+        register_cb(EventType::ib_err_msg, "process_err_msg", &HistBarGetter::process_err_msg);
 
     }
 
@@ -257,9 +296,11 @@ namespace calm {
 //        ARROW_ASSIGN_OR_RAISE(auto sorted_table, arrow::compute::Take(table, *sort_indices));
 //        table = sorted_table.table();
 
+        // create folder
+        std::string const & out_path = sym_req[symbol].save_path;
+        std::filesystem::create_directories(std::filesystem::path{out_path}.parent_path());
         // csv writer
         std::shared_ptr<arrow::io::FileOutputStream> out_file;
-        std::string const & out_path = sym_req[symbol].save_path;
         ARROW_ASSIGN_OR_RAISE(out_file, arrow::io::FileOutputStream::Open(out_path));
         ARROW_ASSIGN_OR_RAISE(auto csv_writer, arrow::csv::MakeCSVWriter(out_file, table->schema()));
         ARROW_RETURN_NOT_OK(csv_writer->WriteTable(*table));
@@ -285,7 +326,6 @@ namespace calm {
         status_str.pop_back();
         status_str.pop_back();
         logger->info("in log_status - The final status is {}", status_str);
-    };
-
+    }
 
 }

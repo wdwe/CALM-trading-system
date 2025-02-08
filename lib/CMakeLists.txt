@@ -8,6 +8,7 @@ add_library(calm
         objects/enums.cpp
         objects/constants.h
         data/historical_data.cpp
+        cfg/cfg.cpp
 )
 
 target_link_libraries(calm

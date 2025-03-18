@@ -79,8 +79,15 @@ namespace calm {
         auto end = cfg["end"].as<std::string>();
         auto timezone = cfg["timezone"].as<std::string>();
         auto type = cfg["type"].as<std::string>();
+
+        auto start_clean = start, end_clean = end;
+        std::replace(start_clean.begin(), start_clean.end(), ' ', '_');
+        std::replace(start_clean.begin(), start_clean.end(), ':', '_');
+        std::replace(end_clean.begin(), end_clean.end(), ' ', '_');
+        std::replace(end_clean.begin(), end_clean.end(), ':', '_');
+
         for (auto it = cfg["downloads"].begin(); it != cfg["downloads"].end(); ++it) {
-            std::string save_path = fmt::format("{}/{}-{}.csv", root_path, it->first.as<std::string>(), type);
+            std::string save_path = fmt::format("{}/{}-{}/{}-{}.csv", root_path, it->first.as<std::string>(), type, start_clean, end_clean);
             auto symbol = it->second.as<std::string>();
             res.emplace_back(symbol, start, end, timezone, type, save_path);
         }

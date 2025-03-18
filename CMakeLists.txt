@@ -56,6 +56,7 @@ find_package(Arrow REQUIRED)
 
 # include/link for all targets
 include_directories(/usr/lib/include)
+link_libraries(/usr/local/lib/libhiredis.a)
 link_directories(/usr/lib/x86_64-linux-gnu)
 link_libraries(spdlog fmt yaml-cpp::yaml-cpp)
 link_libraries(Arrow::arrow_shared)

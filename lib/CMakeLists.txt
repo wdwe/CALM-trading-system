@@ -9,6 +9,7 @@ add_library(calm
         objects/constants.h
         data/historical_data.cpp
         cfg/cfg.cpp
+        database/redis_client.cpp
 )
 
 target_link_libraries(calm

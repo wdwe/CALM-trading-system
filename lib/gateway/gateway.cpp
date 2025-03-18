@@ -251,7 +251,7 @@ namespace calm {
                       orderId, status, decimalToDouble(filled), decimalToDouble(remaining), avgFillPrice, permId,
                       parentId, lastFillPrice, clientId, whyHeld, mktCapPrice);
 
-        OrderStatus status_ = order_status_to_calm[status];
+        OrderStatus status_ = order_status_to_calm.at(status);  // order_status_to_calm is const, so at must be used
         double filled_ = decimalToDouble(filled);
 
         OrderData order_data_;
@@ -275,9 +275,9 @@ namespace calm {
 
     Order IBApi::generate_ib_order(OrderReq const & order_req) {
         Order order;
-        order.action = action_to_ib[order_req.action];
+        order.action = action_to_ib.at(order_req.action);  // action_to_ib is const, so at must be used
         order.totalQuantity = doubleToDecimal(order_req.quantity);
-        order.orderType = order_type_to_ib[order_req.order_type];
+        order.orderType = order_type_to_ib.at(order_req.order_type);
         if (order_req.order_type == OrderType::limit) order.lmtPrice = order_req.price;
 
         order.tif = "DAY";

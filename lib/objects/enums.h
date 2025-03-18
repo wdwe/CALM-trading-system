@@ -33,8 +33,8 @@ namespace calm {
             sell
         };
 
-    extern std::unordered_map<Action, std::string> action_to_ib;
-    extern std::unordered_map<std::string, Action> action_to_calm;
+    extern std::unordered_map<Action, std::string> const action_to_ib;
+    extern std::unordered_map<std::string, Action> const action_to_calm;
 
 
     enum class OrderType {
@@ -42,8 +42,8 @@ namespace calm {
         market
     };
 
-    extern std::unordered_map<OrderType, std::string> order_type_to_ib;
-    extern std::unordered_map<std::string, OrderType> order_type_to_calm;
+    extern std::unordered_map<OrderType, std::string> const order_type_to_ib;
+    extern std::unordered_map<std::string, OrderType> const order_type_to_calm;
 
 
     enum class OrderStatus {
@@ -58,8 +58,8 @@ namespace calm {
     };
 
 
-    extern std::unordered_map<OrderStatus, std::string> order_status_to_ib;
-    extern std::unordered_map<std::string, OrderStatus> order_status_to_calm;
+    extern std::unordered_map<OrderStatus, std::string> const order_status_to_ib;
+    extern std::unordered_map<std::string, OrderStatus> const order_status_to_calm;
 
 
     enum class EventType {

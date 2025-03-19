@@ -10,6 +10,7 @@ add_library(calm
         data/historical_data.cpp
         cfg/cfg.cpp
         database/redis_client.cpp
+        algo/algo_engine.cpp
 )
 
 target_link_libraries(calm

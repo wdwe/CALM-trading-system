@@ -12,6 +12,10 @@ in their own operations.
 - Arrow (https://arrow.apache.org/install/)
 - Hiredis (https://github.com/redis/hiredis/tree/master)
 
+## Strategies
+- Some simple strategies can be found at [calm strategies](https://github.com/wdwe/CALM-trading-strategies) which are 
+used together with this trading system
+
 ## Future Performance Improvements
 While good care and efforts are given to ensure the system is efficient and high-performance, ultra-low latency is not the main
 consideration for this first iteration of design. s 

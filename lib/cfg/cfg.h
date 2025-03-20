@@ -11,6 +11,11 @@ namespace calm {
         int const hist_time_format = 2; // 1: 20231019 16:11:48 America/New_York 2: 1697746308
         int hist_window_sz = 2;
 
+        // trading engine config
+        char const* gateway_host = "";
+        int gateway_port = 7497;
+        int gateway_client_id = 0;
+
         // member functions
         static Config const& get();
 

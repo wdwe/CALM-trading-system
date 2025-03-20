@@ -352,28 +352,34 @@ namespace calm {
 
 
     void IBGateway::subscribe(const std::string &symbol, bool delayed) {
+        std::lock_guard lock{m};
         return api.subscribe(symbol, delayed);
     }
 
     OrderId IBGateway::send_order(const calm::OrderReq &order_req) {
+        std::lock_guard lock{m};
         return api.send_order(order_req);
     }
 
     void IBGateway::cancel_order(calm::OrderId order_id) {
+        std::lock_guard lock{m};
         api.cancel_order(order_id);
     }
 
     void IBGateway::cancel_all_orders() {
+        std::lock_guard lock{m};
         api.cancel_all_orders();
     }
 
     void IBGateway::req_contract_details(const std::string &symbol) {
+        std::lock_guard lock{m};
         api.req_contract_details(symbol);
     }
 
     int IBGateway::req_historical_bar(const std::string &symbol, const std::string &end_time,
                                       const std::string &duration, const std::string &bar_size, const std::string &wts,
                                       int use_rth, int format) {
+        std::lock_guard lock{m};
         return api.req_historical_bar(symbol, end_time, duration, bar_size, wts, use_rth, format);
     }
 

@@ -127,6 +127,7 @@ namespace calm {
         std::shared_ptr<spdlog::async_logger> logger;
         IBApi api;
         EventEngine &event_engine;
+        std::mutex m;
     };
 
 

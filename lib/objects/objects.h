@@ -116,6 +116,13 @@ namespace calm {
     std::string to_string(HistBarEnd const& bar_end);
 
 
+    // timer
+    struct Timer {
+        int sec = -1;
+    };
+
+    std::string to_string(Timer const& timer);
+
 
 }
 

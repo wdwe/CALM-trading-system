@@ -10,7 +10,10 @@ namespace calm {
         return fmt::format("PosMsg(symbol:{}, pos:{}, timestamp:{})", msg.symbol, msg.pos, msg.timestamp);
     }
 
-    AlgoEngine::AlgoEngine(TradingEngine *trading_engine): trading_engine(trading_engine) {
+    AlgoEngine::AlgoEngine(TradingEngine *trading_engine): trading_engine(trading_engine) {}
+
+
+    void AlgoEngine::init() {
         logger = init_sub_logger("algo_engine");
         register_cb(EventType::tick_data, "algo_engine_tick", &AlgoEngine::tick_callback);
     }
@@ -20,7 +23,6 @@ namespace calm {
         logger->info("Starting engine...");
         trading_engine->subscribe("ETH-CRYPTO-USD.PAXOS");
         using namespace std::chrono_literals;
-        std::this_thread::sleep_for(10s);
     }
 
     void AlgoEngine::stop() {

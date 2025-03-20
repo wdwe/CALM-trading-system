@@ -117,4 +117,9 @@ namespace calm {
         return fmt::format("HistBarEnd(id:{}, start:{}, end:{})", bar_end.id, bar_end.start, bar_end.end);
     }
 
+    // timer
+    std::string to_string(Timer const& timer) {
+        return fmt::format("Timer(sec:{})", timer.sec);
+    }
+
 }

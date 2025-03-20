@@ -75,7 +75,10 @@ namespace calm {
         order_data,
         ib_err_msg,
         hist_bar,
-        hist_bar_end
+        hist_bar_end,
+
+        // timer
+        timer
     };
 
 }

@@ -14,6 +14,8 @@ namespace calm {
     class TradingEngine {
     public:
         TradingEngine();
+        TradingEngine(TradingEngine const &other) = delete;
+        TradingEngine(TradingEngine &&other) = delete;
         void start();
         void stop();
         void subscribe(std::string const & symbol, bool delayed=false);

@@ -35,6 +35,7 @@ namespace calm {
             }
             last_ticks[symbol] = std::make_shared<TickData>();
         }
+        logger->info("in subscribe - subscribing to {} delayed:{}", symbol, delayed);
         gateway.subscribe(symbol, delayed);
     }
 

@@ -25,6 +25,11 @@ namespace calm {
     class AlgoEngine {
     public:
         AlgoEngine(TradingEngine* trading_engine);
+        // technically, copy and move constructors should be deleted, but then this
+        // class cannot be initialised into a tuple in the Trader class. This is a design tradeoff.
+        AlgoEngine(AlgoEngine const& other) = default;
+        AlgoEngine(AlgoEngine &&other) = default;
+        void init();
         void start();
         void stop();
     private:

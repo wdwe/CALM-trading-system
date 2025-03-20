@@ -2,7 +2,6 @@
 #define CALM_TRADER_TRADER_H
 #include <chrono>
 #include "trading_engine.h"
-#include "algo/algo_engine.h"
 
 
 namespace calm {

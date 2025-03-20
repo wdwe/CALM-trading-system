@@ -18,14 +18,14 @@ used together with this trading system
 
 ## Future Performance Improvements
 While good care and efforts are given to ensure the system is efficient and high-performance, ultra-low latency is not the main
-consideration for this first iteration of design. s 
+consideration for this first iteration of design.
 
 Below are some pointers for future/next iteration.
 - [ ] use lock-free queue and atomic operations
 - [ ] use more POD instead of shared pointers
 - [ ] for hot path, use stack instead of heap storage (i.e. use `std::move` syntax with queue instead of creating shared
   pointer)
-- [ ] use shared memory instead of message queue to bridge execution system and algo/strategy program
+- [ ] use shared memory instead of message queue to bridge execution system and [algo/strategy program](https://github.com/wdwe/CALM-trading-strategies)
 - [ ] replace the use of `string` with `char[]`/`string_view`/`inplace_string` 
 - [ ] use more `curiously recurring template pattern` to speed up
 - [ ] implement strategies in C++

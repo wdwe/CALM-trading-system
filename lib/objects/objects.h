@@ -68,6 +68,7 @@ namespace calm {
         double price{UnsetDouble};
         OrderId order_id{UnsetLong}; // set to modify order
     };
+    std::string to_string(OrderReq const &req);
 
     struct OrderUpdateReq {
         OrderId order_id;

@@ -102,6 +102,19 @@ namespace calm {
                            tick.symbol, tick.last_price, tick.last_size, tick.bid_price, tick.bid_size, tick.ask_price, tick.ask_size, tick.timestamp);
     }
 
+    // OrderReq
+    std::string to_string(OrderReq const &req) {
+        std::string symbol;
+        std::string exchange;
+        Action action;
+        OrderType order_type;
+        double quantity;
+        double price{UnsetDouble};
+        OrderId order_id{UnsetLong}; // set to modify order
+        return fmt::format("OrderReq(symbol:{}, exchange:{}, action:{}, order_type:{}, quantity:{}, price:{}, order_id:{})",
+                           req.symbol, req.exchange, action_to_ib.at(req.action), order_type_to_ib.at(req.order_type), req.quantity, req.price, req.order_id);
+    }
+
     // OrderData
     std::string to_string(OrderData const & order_data) {
         return fmt::format("OrderData(placeholder)");

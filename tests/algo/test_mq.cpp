@@ -18,12 +18,14 @@ void print_pos_msg(char const*msg, std::size_t len) {
 
 void subscribe(std::function<void(char const*msg, std::size_t len)> cb, std::string const& sentinel) {
     calm::RedisClient client("localhost", 6380);
+    client.connect();
     client.subscribe("action_channel", cb, sentinel);
 }
 
 int main() {
     using namespace std::chrono_literals;
     calm::RedisClient client("localhost", 6380);
+    client.connect();
     std::string sentinel = "sentinel";
     std::thread sub_thread(subscribe, print_pos_msg, sentinel);
 

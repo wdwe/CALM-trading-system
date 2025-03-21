@@ -8,6 +8,7 @@ void print(char const* msg, std::size_t len) {
 
 int main() {
     calm::RedisClient client("localhost", 6380);
+    client.connect();
     client.subscribe("channel_1", print, "end");
 //    client.publish("channel_1", "abcde", 5);
     return 0;

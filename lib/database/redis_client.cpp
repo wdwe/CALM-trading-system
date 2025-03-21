@@ -3,7 +3,16 @@
 #include <fmt/format.h>
 
 namespace calm {
-    RedisClient::RedisClient(std::string const &host, int port) {
+    RedisClient::RedisClient(std::string const &host, int port): host{host}, port{port} {}
+
+
+    RedisClient::~RedisClient() {
+        if (reply != nullptr) free_reply();
+        if (context != nullptr) free_context();
+    }
+
+
+    void RedisClient::connect() {
         context = redisConnect(host.c_str(), port);
         if (context == nullptr || context->err) {
             if (context) {
@@ -13,11 +22,10 @@ namespace calm {
         }
     }
 
-
-    RedisClient::~RedisClient() {
-        if (reply != nullptr) free_reply();
+    void RedisClient::disconnect() {
         if (context != nullptr) free_context();
     }
+
 
     void RedisClient::free_context() {
         redisFree(context);

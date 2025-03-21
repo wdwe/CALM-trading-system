@@ -11,10 +11,14 @@ namespace calm {
     public:
         explicit RedisClient(std::string const& host="localhost", int port=6379);
         ~RedisClient();
+        void connect();
+        void disconnect();
         void publish(std::string const& channel, char const* data, std::size_t sz);
         void subscribe(std::string const& channel, Callback callback, std::string sentinel = "sentinel");
 
     private:
+        std::string host;
+        int port{6379};
         redisReply *reply{nullptr};
         redisContext *context{nullptr};
 

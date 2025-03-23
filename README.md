@@ -1,5 +1,5 @@
 # CALM (Consistent Asset and Liquidity Management) Trading System
-Active work in progress
+**Active work in progress**
 
 ## About
 This is an automated trading system using Interactive Broker's TWS C++ api.
@@ -15,6 +15,14 @@ in their own operations.
 ## Strategies
 - Some simple strategies can be found at [calm strategies](https://github.com/wdwe/CALM-trading-strategies) which are 
 used together with this trading system
+
+
+## Work in Pipeline
+- Central position monitoring module
+- Risk management
+- Central data recording module (saving live market data, orders, algo details etc into MongoDB)
+- BacktestEngine (counterpart of `TradingEngine`) and Backtester (counterpart of `Trader` class)
+
 
 ## Future Performance Improvements
 While good care and efforts are given to ensure the system is efficient and high-performance, ultra-low latency is not the main

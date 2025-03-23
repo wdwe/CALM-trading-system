@@ -77,8 +77,11 @@ namespace calm {
         hist_bar,
         hist_bar_end,
 
-        // timer
-        timer
+        // Timer
+        timer,
+
+        // algo engine
+        algo_pos_update
     };
 
 }

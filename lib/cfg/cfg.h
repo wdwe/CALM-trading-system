@@ -16,6 +16,9 @@ namespace calm {
         int gateway_port = 7497;
         int gateway_client_id = 0;
 
+        // algo_engine
+        std::string const algo_config_path = "/home/wayne/calm/bollinger_band.yaml";
+
         // member functions
         static Config const& get();
 

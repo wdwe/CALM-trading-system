@@ -10,10 +10,6 @@ namespace calm {
         }
         AlgoDummy(AlgoDummy const&) = default;
         AlgoDummy(AlgoDummy &&) = default;
-        void init() {
-            trading_engine->register_cb(EventType::timer, "print_timer",
-                                        [this](Event const& event) {print_timer(event);});
-        }
         void start() {running = true; logger->info("in algo_dummy start");}
         void stop() {running = false; logger->info("in algo_dummy end");}
     private:

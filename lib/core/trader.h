@@ -1,6 +1,7 @@
 #ifndef CALM_TRADER_TRADER_H
 #define CALM_TRADER_TRADER_H
 #include <chrono>
+#include <memory>
 #include "trading_engine.h"
 
 
@@ -14,7 +15,7 @@ namespace calm {
         void run();
     private:
         TradingEngine trading_engine;
-        std::tuple<Algos...> algos{Algos{&trading_engine}...};
+        std::tuple<std::shared_ptr<Algos>...> algos{std::make_shared<Algos>(&trading_engine)...};
 
         template<std::size_t I = 0>
         void start_algos();
@@ -23,10 +24,7 @@ namespace calm {
     };
 
     template<typename ...Algos>
-    Trader<Algos...>::Trader() {
-        // init algos
-        std::apply([](Algos&... algos_) {(algos_.init(),...);}, algos);
-    }
+    Trader<Algos...>::Trader() = default;
 
 
     template<typename ...Algos>
@@ -34,7 +32,7 @@ namespace calm {
     void Trader<Algos...>::start_algos() {
         // or just use std::apply
         if constexpr (I < sizeof...(Algos)) {
-            std::get<I>(algos).start();
+            std::get<I>(algos)->start();
             start_algos<I + 1>();
         }
     }

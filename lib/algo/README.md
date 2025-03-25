@@ -4,3 +4,4 @@ improved to support more complex strategies.
 # Todo
 - pre-feeding historical data to bootstrap/restart algo
 - save algo states to persistence for restarting etc
+- query contract's market opening time during startup

@@ -47,6 +47,17 @@ namespace calm {
         return nullptr;
     }
 
+
+    OrderId TradingEngine::send_order(OrderReq const & order_req) {
+        // TODO: add Risk Management checks here
+        return gateway.send_order(order_req);
+    }
+
+    void TradingEngine::cancel_order(calm::OrderId order_id) {
+        gateway.cancel_order(order_id);
+    }
+
+
     void TradingEngine::send_event(Event &&event) {
         event_engine.send(event);
     }

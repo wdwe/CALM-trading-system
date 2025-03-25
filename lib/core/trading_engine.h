@@ -20,6 +20,8 @@ namespace calm {
         void stop();
         void subscribe(std::string const & symbol, bool delayed=false);
         std::shared_ptr<TickData> get_last_tick(std::string const&);
+        OrderId send_order(OrderReq const & order_req);
+        void cancel_order(OrderId order_id);
         void send_event(Event&& event);
         bool register_cb(EventType const& e_type, std::string const& cb_name, std::function<void(Event const&)> cb);
     private:

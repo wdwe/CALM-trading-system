@@ -9,6 +9,7 @@ add_library(calm
         objects/objects.cpp
         objects/enums.cpp
         objects/constants.h
+        objects/utils.cpp
         data/historical_data.cpp
         cfg/cfg.cpp
         database/redis_client.cpp

@@ -117,7 +117,12 @@ namespace calm {
 
     // OrderData
     std::string to_string(OrderData const & order_data) {
-        return fmt::format("OrderData(placeholder)");
+        return fmt::format("OrderData(order_id:{}, symbol:{}, exchange:{}, order_type:{}, action:{}, total_quantity:{}, "
+                           "traded_quantity:{}, avg_trade_price:{}, commission:{}, OrderStatus:{}, error_code:{})",
+                           order_data.order_id, order_data.symbol, order_data.exchange, order_type_to_ib.at(order_data.order_type),
+                           action_to_ib.at(order_data.action), order_data.total_quantity, order_data.traded_quantity,
+                           order_data.avg_trade_price, order_data.commission, order_status_to_ib.at(order_data.status),
+                           order_data.error_code);
     }
 
     // Historical Data

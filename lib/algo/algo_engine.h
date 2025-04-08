@@ -43,6 +43,7 @@ namespace calm {
         void stop();
 
     private:
+        std::string name{"algo_engine"};
         TradingEngine* trading_engine{nullptr};
         std::shared_ptr<spdlog::async_logger> logger;
         bool running{false};

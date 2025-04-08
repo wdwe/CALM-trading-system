@@ -207,7 +207,7 @@ namespace calm {
 
         OrderId order_id_ = is_unset_llong(order_req.order_id) ? m_order_id++ : order_req.order_id;
         auto order = generate_ib_order(order_req);
-        OrderData order_data{order_id_, order_req.symbol, order_req.exchange, order_req.order_type, order_req.action,
+        OrderData order_data{order_id_, order_req.symbol, order_req.exchange, order_req.source, order_req.order_type, order_req.action,
                              order_req.quantity};
 
         bool order_flag{false};

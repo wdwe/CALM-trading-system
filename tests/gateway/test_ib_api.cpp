@@ -36,7 +36,6 @@ int main() {
 
     EventEngine event_engine;
     IBGateway gateway{event_engine};
-//    IBApi api{gateway};
 
     std::vector<EventType> event_types{
             EventType::order_data, EventType::tick_data, EventType::hist_bar, EventType::hist_bar_end
@@ -56,20 +55,20 @@ int main() {
 /*
  * Live Data Subscription
  */
-//    api.subscribe("USD-CASH-SGD.IDEALPRO", false);// 6758-STK-JPY.TSEJ ETH-CRYPTO-USD.PAXOS USD-CASH-SGD.IDEALPRO 1810-FUT-HKD.HKFE
+//    gateway.subscribe("USD-CASH-SGD.IDEALPRO", false);// 6758-STK-JPY.TSEJ ETH-CRYPTO-USD.PAXOS USD-CASH-SGD.IDEALPRO 1810-FUT-HKD.HKFE
 
 /*
  * Order
  */
-//    OrderReq req{"ADS-STK-EUR.SMART", "SMART", Action::buy, OrderType::limit, 10, 200};
-//    OrderId id = api.send_order(req);
+//    OrderReq req{"BABA-STK-USD.SMART", "SMART", "test", Action::buy, OrderType::limit, 1, 116.2};
+//    OrderId id = gateway.send_order(req); //USD-CASH-SGD.IDEALPRO, ETH-CRYPTO-USD.PAXOS
 //    logger->info("Order id is {}", id);
-//    api.cancel_order(21);
-//    OrderReq req_1{"1810-STK-HKD.SEHK", "SEHK", Action::buy, OrderType::limit, 400, 36, 19};
-//    OrderId id_1 = api.send_order(req_1);
+//    gateway.cancel_order(id);
+    OrderReq req_1{"1810-STK-HKD.SEHK", "SEHK", "test", Action::buy, OrderType::limit, 200, 40};
+    OrderId id_1 = gateway.send_order(req_1);
 //    logger->info("OrderId is {}", id_1);
-//    api.send_order("USD-CASH-SGD.IDEALPRO", "buy", 200, 1.359);
-//    api.send_order("ETH-CRYPTO-USD.PAXOS", "buy", 0.012, 3120);
+//    std::this_thread::sleep_for(1s);
+//    gateway.cancel_order(id_1);
 
 /*
  * Contract Details
@@ -79,7 +78,7 @@ int main() {
 /*
  *  Historical Data
  */
-    gateway.req_historical_bar("6758-STK-JPY.SMART", "20250129 14:20:31 Asia/Singapore", "1800 S", "5 secs", "TRADES", 1, 1);
+//    gateway.req_historical_bar("6758-STK-JPY.SMART", "20250129 14:20:31 Asia/Singapore", "1800 S", "5 secs", "TRADES", 1, 1);
 
 
 

@@ -62,6 +62,7 @@ namespace calm {
     struct OrderReq {
         std::string symbol;
         std::string exchange;
+        std::string source;
         Action action;
         OrderType order_type;
         double quantity;
@@ -82,6 +83,7 @@ namespace calm {
         OrderId order_id;
         std::string symbol;
         std::string exchange;
+        std::string source;
 
         OrderType order_type;
         Action action;

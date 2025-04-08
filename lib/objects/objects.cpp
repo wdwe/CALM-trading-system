@@ -104,22 +104,15 @@ namespace calm {
 
     // OrderReq
     std::string to_string(OrderReq const &req) {
-        std::string symbol;
-        std::string exchange;
-        Action action;
-        OrderType order_type;
-        double quantity;
-        double price{UnsetDouble};
-        OrderId order_id{UnsetLong}; // set to modify order
-        return fmt::format("OrderReq(symbol:{}, exchange:{}, action:{}, order_type:{}, quantity:{}, price:{}, order_id:{})",
-                           req.symbol, req.exchange, action_to_ib.at(req.action), order_type_to_ib.at(req.order_type), req.quantity, req.price, req.order_id);
+        return fmt::format("OrderReq(symbol:{}, exchange:{}, source:{}, action:{}, order_type:{}, quantity:{}, price:{}, order_id:{})",
+                           req.symbol, req.exchange, req.source, action_to_ib.at(req.action), order_type_to_ib.at(req.order_type), req.quantity, req.price, req.order_id);
     }
 
     // OrderData
     std::string to_string(OrderData const & order_data) {
-        return fmt::format("OrderData(order_id:{}, symbol:{}, exchange:{}, order_type:{}, action:{}, total_quantity:{}, "
+        return fmt::format("OrderData(order_id:{}, symbol:{}, exchange:{}, source:{}, order_type:{}, action:{}, total_quantity:{}, "
                            "traded_quantity:{}, avg_trade_price:{}, commission:{}, OrderStatus:{}, error_code:{})",
-                           order_data.order_id, order_data.symbol, order_data.exchange, order_type_to_ib.at(order_data.order_type),
+                           order_data.order_id, order_data.symbol, order_data.exchange, order_data.source, order_type_to_ib.at(order_data.order_type),
                            action_to_ib.at(order_data.action), order_data.total_quantity, order_data.traded_quantity,
                            order_data.avg_trade_price, order_data.commission, order_status_to_ib.at(order_data.status),
                            order_data.error_code);

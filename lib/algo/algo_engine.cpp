@@ -156,6 +156,7 @@ namespace calm {
         OrderReq order_req;
         order_req.symbol = symbol;
         order_req.action = quantity < 0? Action::sell: Action::buy;
+        order_req.source = name;
         order_req.quantity = std::abs(quantity);
         order_req.order_type = OrderType::market;
         logger->info("Sending order:{}", to_string(order_req));

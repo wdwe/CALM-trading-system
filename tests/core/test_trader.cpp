@@ -5,7 +5,7 @@
 namespace calm {
     class AlgoDummy {
     public:
-        AlgoDummy(TradingEngine* trading_engine): trading_engine(trading_engine) {
+        AlgoDummy(TradingEngine& trading_engine): trading_engine(trading_engine) {
             logger = init_sub_logger("algo_dummy");
         }
         AlgoDummy(AlgoDummy const&) = default;
@@ -13,7 +13,7 @@ namespace calm {
         void start() {running = true; logger->info("in algo_dummy start");}
         void stop() {running = false; logger->info("in algo_dummy end");}
     private:
-        TradingEngine* trading_engine{nullptr};
+        TradingEngine& trading_engine;
         std::shared_ptr<spdlog::async_logger> logger;
         bool running{false};
         void print_timer(Event const& event) {

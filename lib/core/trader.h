@@ -22,7 +22,7 @@ namespace calm {
         IBGateway gateway{event_engine};
         MarketDataManager mktd_mgr{gateway};
         TradingEngine trading_engine{event_engine, gateway, mktd_mgr};
-        std::tuple<std::shared_ptr<Algos>...> algos{std::make_shared<Algos>(&trading_engine)...};
+        std::tuple<std::shared_ptr<Algos>...> algos{std::make_shared<Algos>(trading_engine)...};
 
         template<std::size_t I = 0>
         void start_algos();

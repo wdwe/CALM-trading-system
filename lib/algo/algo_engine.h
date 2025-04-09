@@ -36,7 +36,7 @@ namespace calm {
 
     class AlgoEngine {
     public:
-        explicit AlgoEngine(TradingEngine* trading_engine);
+        explicit AlgoEngine(TradingEngine& trading_engine);
         AlgoEngine(AlgoEngine const& other) = delete;
         AlgoEngine(AlgoEngine &&other) = delete;
         void start();
@@ -44,7 +44,7 @@ namespace calm {
 
     private:
         std::string name{"algo_engine"};
-        TradingEngine* trading_engine{nullptr};
+        TradingEngine& trading_engine;
         std::shared_ptr<spdlog::async_logger> logger;
         bool running{false};
         bool register_cb(EventType const &e_type, std::string const &cb_name, void (AlgoEngine::*cb)(Event const &));

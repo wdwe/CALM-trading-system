@@ -17,7 +17,7 @@ namespace calm {
         return fmt::format("PosUpdate(symbol:{}, pos:{}, timestamp:{}, retry:{})", msg.symbol, msg.pos, msg.timestamp, msg.retry);
     }
 
-    AlgoEngine::AlgoEngine(TradingEngine *trading_engine): trading_engine(trading_engine) {
+    AlgoEngine::AlgoEngine(TradingEngine& trading_engine): trading_engine(trading_engine) {
         logger = init_sub_logger("algo_engine");
         auto const& global_cfg = Config::get();
         auto const& algo_cfg_path = global_cfg.algo_config_path;
@@ -45,7 +45,7 @@ namespace calm {
         running = true;
         logger->info("Starting engine...");
         pub_redis.connect();
-        trading_engine->subscribe(mkt_data_symbol);
+        trading_engine.subscribe(mkt_data_symbol);
         listen_thread = std::thread(&AlgoEngine::run_redis_sub, this);
         action_thread = std::thread(&AlgoEngine::run_actions, this);
     }
@@ -59,7 +59,7 @@ namespace calm {
     }
 
     bool AlgoEngine::register_cb(EventType const &e_type, std::string const &cb_name, void(AlgoEngine::*cb)(Event const&)) {
-        return trading_engine->register_cb(e_type, cb_name, [this, cb](Event const& event){(this->*cb)(event);});
+        return trading_engine.register_cb(e_type, cb_name, [this, cb](Event const& event){(this->*cb)(event);});
     }
 
     void AlgoEngine::event_engine_timer_cb(Event const & event) {
@@ -111,7 +111,7 @@ namespace calm {
     }
 
     void AlgoEngine::timer_cb(Event const &event) {
-        auto tick = trading_engine->get_last_tick(mkt_data_symbol);
+        auto tick = trading_engine.get_last_tick(mkt_data_symbol);
         TickMsg tick_msg("", tick->last_price, tick->timestamp);
         std::strncpy(tick_msg.symbol, tick->symbol.c_str(), std::size(tick_msg.symbol));
         logger->info("sending tick to strategy {}", to_string(*tick));
@@ -126,7 +126,7 @@ namespace calm {
             if (inflight_order_id > 0) {
                 if (!order_cancelled) { // this order has not been cancelled
                     logger->warn("in update_pos_cb - unfilled {}", to_string(order_reqs.at(inflight_order_id)));
-                    trading_engine->cancel_order(inflight_order_id);
+                    trading_engine.cancel_order(inflight_order_id);
                     order_cancelled = true;
                 } else if (!pos->retry) { // a new pos req arrived
                     logger->error("in update_pos_cb - order filling latency is too high");
@@ -160,7 +160,7 @@ namespace calm {
         order_req.quantity = std::abs(quantity);
         order_req.order_type = OrderType::market;
         logger->info("Sending order:{}", to_string(order_req));
-        OrderId order_id = trading_engine->send_order(order_req);
+        OrderId order_id = trading_engine.send_order(order_req);
         {
             std::lock_guard lock{pos_order_m};
             inflight_order_id = order_id;

@@ -3,9 +3,13 @@
 #include <chrono>
 #include <memory>
 #include "trading_engine.h"
+#include "cfg/cfg.h"
 
 
 namespace calm {
+    /*
+     * Declaration
+     */
     template<typename ...Algos>
     class Trader {
     public:
@@ -15,7 +19,9 @@ namespace calm {
         void run();
     private:
         EventEngine event_engine;
-        TradingEngine trading_engine{event_engine};
+        IBGateway gateway{event_engine};
+        MarketDataManager mktd_mgr{gateway};
+        TradingEngine trading_engine{event_engine, gateway, mktd_mgr};
         std::tuple<std::shared_ptr<Algos>...> algos{std::make_shared<Algos>(&trading_engine)...};
 
         template<std::size_t I = 0>
@@ -24,6 +30,9 @@ namespace calm {
         void send_timer();
     };
 
+    /*
+     * Definition
+     */
     template<typename ...Algos>
     Trader<Algos...>::Trader() = default;
 
@@ -42,7 +51,8 @@ namespace calm {
     template<typename ...Algos>
     void Trader<Algos...>::run() {
         event_engine.start();
-        trading_engine.start();
+        auto const& cfg = Config::get();
+        gateway.start(cfg.gateway_host, cfg.gateway_port, cfg.gateway_client_id);
         start_algos();
 
         while (true) {
@@ -51,27 +61,26 @@ namespace calm {
             // algo's (and other modules') stopping conditions (risk too high, market closed...) can be checked here
         }
 
-        trading_engine.stop();
+        gateway.stop();
         event_engine.stop();
     }
 
-        template<typename ...Algos>
-        void Trader<Algos...>::send_timer() {
-            using namespace std::chrono;
-            using namespace std::chrono_literals;
-            static auto target = floor<seconds>(system_clock::now()) + 1s;
-            auto t = floor<seconds>(system_clock::now());
+    template<typename ...Algos>
+    void Trader<Algos...>::send_timer() {
+        using namespace std::chrono;
+        using namespace std::chrono_literals;
+        static auto target = floor<seconds>(system_clock::now()) + 1s;
+        auto t = floor<seconds>(system_clock::now());
 
-            if (t >= target) {
-                target += 1s;
-                trading_engine.send_event(Event(EventType::timer, std::make_shared<Timer>(t.time_since_epoch().count() % 60)));
-            }
-
+        if (t >= target) {
+            target += 1s;
+            trading_engine.send_event(Event(EventType::timer, std::make_shared<Timer>(t.time_since_epoch().count() % 60)));
         }
+
+    }
 
 
 }
-
 
 
 #endif //CALM_TRADER_TRADER_H

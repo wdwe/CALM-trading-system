@@ -1,5 +1,6 @@
 add_library(calm
         core/event.cpp
+        core/market_data.cpp
         core/trading_engine.cpp
         core/trader.cpp
         gateway/gateway.cpp

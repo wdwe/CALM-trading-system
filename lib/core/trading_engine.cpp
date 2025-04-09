@@ -5,44 +5,18 @@
 
 
 namespace calm {
-    TradingEngine::TradingEngine(EventEngine& event_engine): event_engine{event_engine}, gateway{event_engine} {
+    TradingEngine::TradingEngine(EventEngine& event_engine, IBGateway& gateway, MarketDataManager& mktd_mgr):
+    event_engine{event_engine}, gateway{gateway}, mktd_mgr{mktd_mgr} {
         logger = init_sub_logger("trading_engine");
         register_cb(EventType::tick_data, "trading_engine_tick_update", &TradingEngine::update_ticks);
-
-    }
-
-    void TradingEngine::start() {
-        running = true;
-        auto const& cfg = Config::get();
-        gateway.start(cfg.gateway_host, cfg.gateway_port, cfg.gateway_client_id);
-    }
-
-
-    void TradingEngine::stop() {
-        if (!running) return;
-        running = false;
-        gateway.stop();
     }
 
     void TradingEngine::subscribe(std::string const &symbol, bool delayed) {
-        {
-            std::lock_guard lock{ticks_mutex};
-            if (last_ticks.contains(symbol)) {
-                logger->info("in subscribe - {} is already subscribed", symbol);
-                return;
-            }
-            last_ticks[symbol] = std::make_shared<TickData>();
-        }
-        logger->info("in subscribe - subscribing to {} delayed:{}", symbol, delayed);
-        gateway.subscribe(symbol, delayed);
+        mktd_mgr.subscribe(symbol, delayed);
     }
 
     std::shared_ptr<TickData> TradingEngine::get_last_tick(std::string const& symbol) {
-        std::lock_guard lock{ticks_mutex};
-        if (last_ticks.contains(symbol)) {
-            return last_ticks[symbol];
-        }
-        return nullptr;
+        return mktd_mgr.get_last_tick(symbol);
     }
 
 
@@ -73,11 +47,7 @@ namespace calm {
     }
 
     void TradingEngine::update_ticks(Event const &event) {
-        auto data = std::static_pointer_cast<TickData>(event.data);
-        {
-            std::lock_guard lock{ticks_mutex};
-            last_ticks[data->symbol] = data;
-        }
+        mktd_mgr.update_ticks(event);
     }
 
 

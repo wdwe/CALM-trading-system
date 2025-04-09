@@ -7,17 +7,16 @@
 #include <tuple>
 
 #include "event.h"
+#include "market_data.h"
 #include "gateway/gateway.h"
 
 
 namespace calm {
     class TradingEngine {
     public:
-        explicit TradingEngine(EventEngine& event_engine);
+        explicit TradingEngine(EventEngine& event_engine, IBGateway& gateway, MarketDataManager& mktd_mgr);
         TradingEngine(TradingEngine const &other) = delete;
         TradingEngine(TradingEngine &&other) = delete;
-        void start();
-        void stop();
         void subscribe(std::string const & symbol, bool delayed=false);
         std::shared_ptr<TickData> get_last_tick(std::string const&);
         OrderId send_order(OrderReq const & order_req);
@@ -28,7 +27,8 @@ namespace calm {
         bool running{false};
         std::shared_ptr<spdlog::async_logger> logger;
         EventEngine& event_engine;
-        IBGateway gateway;
+        IBGateway& gateway;
+        MarketDataManager& mktd_mgr;
 
 
         // register_member
@@ -38,8 +38,6 @@ namespace calm {
         std::mutex gateway_mutex;
 
         // market data
-        std::mutex ticks_mutex;
-        std::unordered_map<std::string, std::shared_ptr<TickData>> last_ticks;
         void update_ticks(Event const& event);
 
     };

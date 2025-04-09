@@ -14,7 +14,8 @@ namespace calm {
         Trader(Trader &&) = delete;
         void run();
     private:
-        TradingEngine trading_engine;
+        EventEngine event_engine;
+        TradingEngine trading_engine{event_engine};
         std::tuple<std::shared_ptr<Algos>...> algos{std::make_shared<Algos>(&trading_engine)...};
 
         template<std::size_t I = 0>
@@ -40,6 +41,7 @@ namespace calm {
 
     template<typename ...Algos>
     void Trader<Algos...>::run() {
+        event_engine.start();
         trading_engine.start();
         start_algos();
 
@@ -50,6 +52,7 @@ namespace calm {
         }
 
         trading_engine.stop();
+        event_engine.stop();
     }
 
         template<typename ...Algos>

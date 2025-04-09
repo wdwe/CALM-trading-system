@@ -13,7 +13,7 @@
 namespace calm {
     class TradingEngine {
     public:
-        TradingEngine();
+        explicit TradingEngine(EventEngine& event_engine);
         TradingEngine(TradingEngine const &other) = delete;
         TradingEngine(TradingEngine &&other) = delete;
         void start();
@@ -27,7 +27,7 @@ namespace calm {
     private:
         bool running{false};
         std::shared_ptr<spdlog::async_logger> logger;
-        EventEngine event_engine;
+        EventEngine& event_engine;
         IBGateway gateway;
 
 

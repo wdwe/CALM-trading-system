@@ -5,7 +5,7 @@
 
 
 namespace calm {
-    TradingEngine::TradingEngine(): event_engine{}, gateway{event_engine} {
+    TradingEngine::TradingEngine(EventEngine& event_engine): event_engine{event_engine}, gateway{event_engine} {
         logger = init_sub_logger("trading_engine");
         register_cb(EventType::tick_data, "trading_engine_tick_update", &TradingEngine::update_ticks);
 
@@ -14,7 +14,6 @@ namespace calm {
     void TradingEngine::start() {
         running = true;
         auto const& cfg = Config::get();
-        event_engine.start();
         gateway.start(cfg.gateway_host, cfg.gateway_port, cfg.gateway_client_id);
     }
 
@@ -22,7 +21,6 @@ namespace calm {
     void TradingEngine::stop() {
         if (!running) return;
         running = false;
-        event_engine.stop();
         gateway.stop();
     }
 

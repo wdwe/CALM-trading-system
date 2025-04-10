@@ -9,6 +9,7 @@
 #include "core/trading_engine.h"
 #include "utils/lock_based_queue.h"
 #include "database/redis_client.h"
+#include "core/portfolio.h"
 
 namespace calm {
     struct TickMsg {
@@ -36,7 +37,7 @@ namespace calm {
 
     class AlgoEngine {
     public:
-        explicit AlgoEngine(TradingEngine& trading_engine);
+        AlgoEngine(TradingEngine& trading_engine, Portfolio& portfolio);
         AlgoEngine(AlgoEngine const& other) = delete;
         AlgoEngine(AlgoEngine &&other) = delete;
         void start();

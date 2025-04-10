@@ -17,13 +17,15 @@ namespace calm {
         return fmt::format("PosUpdate(symbol:{}, pos:{}, timestamp:{}, retry:{})", msg.symbol, msg.pos, msg.timestamp, msg.retry);
     }
 
-    AlgoEngine::AlgoEngine(TradingEngine& trading_engine): trading_engine(trading_engine) {
+    AlgoEngine::AlgoEngine(TradingEngine& trading_engine, Portfolio& portfolio): trading_engine(trading_engine) {
         logger = init_sub_logger("algo_engine");
         auto const& global_cfg = Config::get();
         auto const& algo_cfg_path = global_cfg.algo_config_path;
         auto cfg = YAML::LoadFile(algo_cfg_path);
         mkt_data_symbol = cfg["market_data_symbol"].as<std::string>();
         order_symbol = cfg["order_symbol"].as<std::string>();
+        portfolio.add_market_data_mapping(name, order_symbol, mkt_data_symbol);
+        portfolio.add_to_portfolio(name, order_symbol);
 
         auto redis_node = cfg["redis_cfg"];
         redis_host = redis_node["host"].as<std::string>();

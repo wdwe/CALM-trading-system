@@ -122,9 +122,26 @@ namespace calm {
     // timer
     struct Timer {
         int sec = -1;
+        time_t timestamp = 0;
     };
 
     std::string to_string(Timer const& timer);
+
+    // Portfolio
+    struct AlgoPnL {
+        std::string algo;
+        double pnl;
+        time_t timestamp;
+    };
+
+    std::string to_string(AlgoPnL const& pnl);
+
+    struct TotalPnL {
+        double pnl;
+        time_t timestamp;
+    };
+
+    std::string to_string(TotalPnL const& pnl);
 
 
 }

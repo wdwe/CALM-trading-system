@@ -3,6 +3,7 @@ add_library(calm
         core/market_data.cpp
         core/trading_engine.cpp
         core/trader.cpp
+        core/portfolio.cpp
         gateway/gateway.cpp
         utils/logging.cpp
         utils/utils.cpp

@@ -133,4 +133,13 @@ namespace calm {
         return fmt::format("Timer(sec:{})", timer.sec);
     }
 
+    // Portfolio
+    std::string to_string(AlgoPnL const& pnl) {
+        return fmt::format("AlgoPnL(algo:{}, pnl:{}, timestamp:{})", pnl.algo, pnl.pnl, pnl.timestamp);
+    }
+
+    std::string to_string(TotalPnL const& pnl) {
+        return fmt::format("TotalPnl(pnl:{}, timestamp:{})", pnl.pnl, pnl.timestamp);
+    }
+
 }

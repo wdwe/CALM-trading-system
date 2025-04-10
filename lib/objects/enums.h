@@ -81,7 +81,11 @@ namespace calm {
         timer,
 
         // algo engine
-        algo_pos_update
+        algo_pos_update,
+
+        // portfolio
+        algo_pnl,
+        total_pnl
     };
 
 }

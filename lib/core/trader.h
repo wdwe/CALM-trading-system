@@ -3,6 +3,7 @@
 #include <chrono>
 #include <memory>
 #include "trading_engine.h"
+#include "portfolio.h"
 #include "cfg/cfg.h"
 
 
@@ -21,8 +22,9 @@ namespace calm {
         EventEngine event_engine;
         IBGateway gateway{event_engine};
         MarketDataManager mktd_mgr{gateway};
+        Portfolio portfolio{event_engine, mktd_mgr};
         TradingEngine trading_engine{event_engine, gateway, mktd_mgr};
-        std::tuple<std::shared_ptr<Algos>...> algos{std::make_shared<Algos>(trading_engine)...};
+        std::tuple<std::shared_ptr<Algos>...> algos{std::make_shared<Algos>(trading_engine, portfolio)...};
 
         template<std::size_t I = 0>
         void start_algos();
@@ -53,6 +55,7 @@ namespace calm {
         event_engine.start();
         auto const& cfg = Config::get();
         gateway.start(cfg.gateway_host, cfg.gateway_port, cfg.gateway_client_id);
+        portfolio.start();
         start_algos();
 
         while (true) {
@@ -60,7 +63,7 @@ namespace calm {
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
             // algo's (and other modules') stopping conditions (risk too high, market closed...) can be checked here
         }
-
+        portfolio.stop();
         gateway.stop();
         event_engine.stop();
     }
@@ -74,7 +77,8 @@ namespace calm {
 
         if (t >= target) {
             target += 1s;
-            trading_engine.send_event(Event(EventType::timer, std::make_shared<Timer>(t.time_since_epoch().count() % 60)));
+            time_t timestamp = t.time_since_epoch().count();
+            trading_engine.send_event(Event(EventType::timer, std::make_shared<Timer>(timestamp % 60, timestamp)));
         }
 
     }

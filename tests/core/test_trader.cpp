@@ -5,7 +5,7 @@
 namespace calm {
     class AlgoDummy {
     public:
-        AlgoDummy(TradingEngine& trading_engine): trading_engine(trading_engine) {
+        AlgoDummy(TradingEngine& trading_engine, Portfolio& portfolio): trading_engine(trading_engine) {
             logger = init_sub_logger("algo_dummy");
         }
         AlgoDummy(AlgoDummy const&) = default;

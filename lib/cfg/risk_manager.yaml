@@ -1,0 +1,4 @@
+algo_pnl_lmt:
+  algo_engine: -1000000
+total_pnl_lmt: -1000000
+order_flow_lmt: 100

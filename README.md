@@ -18,7 +18,6 @@ used together with this trading system
 
 
 ## Work in Pipelines
-- Risk management
 - Central data recording module (saving live market data, orders, algo details etc into MongoDB)
 - BacktestEngine (counterpart of `TradingEngine`) and Backtester (counterpart of `Trader` class)
 

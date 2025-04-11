@@ -19,6 +19,9 @@ namespace calm {
         // algo_engine
         std::string const algo_config_path = "/home/wayne/calm/bollinger_band.yaml";
 
+        // risk_manager
+        std::string const risk_config_path = "/home/wayne/calm/risk_manager.yaml";
+
         // member functions
         static Config const& get();
 

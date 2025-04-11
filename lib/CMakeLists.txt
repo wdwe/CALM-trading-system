@@ -4,6 +4,7 @@ add_library(calm
         core/trading_engine.cpp
         core/trader.cpp
         core/portfolio.cpp
+        core/risk.cpp
         gateway/gateway.cpp
         utils/logging.cpp
         utils/utils.cpp

@@ -4,6 +4,7 @@
 #include <memory>
 #include "trading_engine.h"
 #include "portfolio.h"
+#include "risk.h"
 #include "cfg/cfg.h"
 
 
@@ -23,7 +24,8 @@ namespace calm {
         IBGateway gateway{event_engine};
         MarketDataManager mktd_mgr{gateway};
         Portfolio portfolio{event_engine, mktd_mgr};
-        TradingEngine trading_engine{event_engine, gateway, mktd_mgr};
+        RiskManager risk_manager{event_engine, portfolio};
+        TradingEngine trading_engine{event_engine, gateway, mktd_mgr, risk_manager};
         std::tuple<std::shared_ptr<Algos>...> algos{std::make_shared<Algos>(trading_engine, portfolio)...};
 
         template<std::size_t I = 0>

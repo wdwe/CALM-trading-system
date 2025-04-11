@@ -163,7 +163,7 @@ namespace calm {
         order_req.order_type = OrderType::market;
         logger->info("Sending order:{}", to_string(order_req));
         OrderId order_id = trading_engine.send_order(order_req);
-        {
+        if (order_id > 0) {
             std::lock_guard lock{pos_order_m};
             inflight_order_id = order_id;
             order_status[order_id] = OrderStatus::pending_submit;
@@ -171,6 +171,8 @@ namespace calm {
             order_reqs[order_id] = order_req;
             order_target = quantity;
             order_filled = 0;
+        } else {
+            logger->warn("in send_order - order not sent for {}", to_string(order_req));
         }
     }
 

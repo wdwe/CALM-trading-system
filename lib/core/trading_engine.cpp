@@ -5,8 +5,8 @@
 
 
 namespace calm {
-    TradingEngine::TradingEngine(EventEngine& event_engine, IBGateway& gateway, MarketDataManager& mktd_mgr):
-    event_engine{event_engine}, gateway{gateway}, mktd_mgr{mktd_mgr} {
+    TradingEngine::TradingEngine(EventEngine& event_engine, IBGateway& gateway, MarketDataManager& mktd_mgr, RiskManager& risk_manager):
+    event_engine{event_engine}, gateway{gateway}, mktd_mgr{mktd_mgr}, risk_manager{risk_manager} {
         logger = init_sub_logger("trading_engine");
         register_cb(EventType::tick_data, "trading_engine_tick_update", &TradingEngine::update_ticks);
     }
@@ -21,7 +21,7 @@ namespace calm {
 
 
     OrderId TradingEngine::send_order(OrderReq const & order_req) {
-        // TODO: add Risk Management checks here
+        if (!risk_manager.check_risk(order_req)) return -1;
         return gateway.send_order(order_req);
     }
 

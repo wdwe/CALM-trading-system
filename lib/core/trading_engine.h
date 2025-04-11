@@ -9,12 +9,14 @@
 #include "event.h"
 #include "market_data.h"
 #include "gateway/gateway.h"
+#include "portfolio.h"
+#include "risk.h"
 
 
 namespace calm {
     class TradingEngine {
     public:
-        explicit TradingEngine(EventEngine& event_engine, IBGateway& gateway, MarketDataManager& mktd_mgr);
+        TradingEngine(EventEngine& event_engine, IBGateway& gateway, MarketDataManager& mktd_mgr, RiskManager& risk_manager);
         TradingEngine(TradingEngine const &other) = delete;
         TradingEngine(TradingEngine &&other) = delete;
         void subscribe(std::string const & symbol, bool delayed=false);
@@ -29,6 +31,7 @@ namespace calm {
         EventEngine& event_engine;
         IBGateway& gateway;
         MarketDataManager& mktd_mgr;
+        RiskManager& risk_manager;
 
 
         // register_member

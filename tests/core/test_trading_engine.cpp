@@ -13,7 +13,8 @@ int main() {
     calm::IBGateway gateway{event_engine};
     calm::MarketDataManager mktd_mgr{gateway};
     calm::Portfolio portfolio{event_engine, mktd_mgr};
-    calm::TradingEngine engine{event_engine, gateway, mktd_mgr};
+    calm::RiskManager risk_manager{event_engine, portfolio};
+    calm::TradingEngine engine{event_engine, gateway, mktd_mgr, risk_manager};
     calm::AlgoEngine algo(engine, portfolio);
     auto const& cfg = calm::Config::get();
     event_engine.start();

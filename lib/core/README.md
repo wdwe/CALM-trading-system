@@ -11,3 +11,7 @@ callback member function requires a wrapper of
     }
     ```
   which may be a good use case for macro (?).
+- Split `buy`/`sell` to different order classes and use template to remove if/else checking. 
+- In `Portfolio` track PnL in one currency. Currency data subscription is needed and contract's currency type needs to be queried.
+- Make `RiskManager` a template so if/else condition can be shifted to compile time. This may require re-design the whole
+system around different algos.

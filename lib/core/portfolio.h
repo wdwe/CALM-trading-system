@@ -8,7 +8,7 @@
 #include <utils/logging.h>
 #include "utils/lock_based_queue.h"
 #include "event.h"
-#include "trading_engine.h"
+#include "market_data.h"
 
 namespace calm {
     struct TradeRec {

@@ -14,6 +14,7 @@ add_library(calm
         objects/constants.h
         objects/utils.cpp
         data/historical_data.cpp
+        data/data_recorder.cpp
         cfg/cfg.cpp
         database/redis_client.cpp
         algo/algo_engine.cpp

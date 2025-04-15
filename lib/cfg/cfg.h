@@ -22,6 +22,10 @@ namespace calm {
         // risk_manager
         std::string const risk_config_path = "/home/wayne/calm/risk_manager.yaml";
 
+        // data_recorder
+        std::string const mongodb_conn_str = "mongodb://localhost:27017";
+        std::string const mongodb_db_str = "calm_live";
+
         // member functions
         static Config const& get();
 

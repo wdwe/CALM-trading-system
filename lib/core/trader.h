@@ -6,6 +6,7 @@
 #include "portfolio.h"
 #include "risk.h"
 #include "cfg/cfg.h"
+#include "data/data_recorder.h"
 
 
 namespace calm {
@@ -27,6 +28,8 @@ namespace calm {
         RiskManager risk_manager{event_engine, portfolio};
         TradingEngine trading_engine{event_engine, gateway, mktd_mgr, risk_manager};
         std::tuple<std::shared_ptr<Algos>...> algos{std::make_shared<Algos>(trading_engine, portfolio)...};
+        DataRecorder data_recorder{event_engine, Config::get().mongodb_conn_str, Config::get().mongodb_db_str};
+
 
         template<std::size_t I = 0>
         void start_algos();
@@ -55,6 +58,7 @@ namespace calm {
     template<typename ...Algos>
     void Trader<Algos...>::run() {
         event_engine.start();
+        data_recorder.start();
         auto const& cfg = Config::get();
         gateway.start(cfg.gateway_host, cfg.gateway_port, cfg.gateway_client_id);
         portfolio.start();
@@ -67,6 +71,7 @@ namespace calm {
         }
         portfolio.stop();
         gateway.stop();
+        data_recorder.stop();
         event_engine.stop();
     }
 

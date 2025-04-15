@@ -56,7 +56,12 @@ find_package(Arrow REQUIRED)
 
 # include/link for all targets
 include_directories(/usr/lib/include)
+include_directories(/usr/local/include/bsoncxx/v_noabi)
+include_directories(/usr/local/include/mongocxx/v_noabi)
+
 link_libraries(/usr/local/lib/libhiredis.a)
+link_libraries(/usr/local/lib/libbsoncxx.so)
+link_libraries(/usr/local/lib/libmongocxx.so)
 link_directories(/usr/lib/x86_64-linux-gnu)
 link_libraries(spdlog fmt yaml-cpp::yaml-cpp)
 link_libraries(Arrow::arrow_shared)

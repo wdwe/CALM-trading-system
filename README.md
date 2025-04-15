@@ -11,6 +11,7 @@ in their own operations.
 - spdlog `sudo apt install libspdlog-dev`
 - Arrow (https://arrow.apache.org/install/)
 - Hiredis (https://github.com/redis/hiredis/tree/master)
+- MongoDB C++ Driver (https://www.mongodb.com/docs/languages/cpp/cpp-driver/current/get-started/)
 
 ## Strategies
 - Some simple strategies can be found at [calm strategies](https://github.com/wdwe/CALM-trading-strategies) which are 
@@ -18,7 +19,6 @@ used together with this trading system
 
 
 ## Work in Pipelines
-- Central data recording module (saving live market data, orders, algo details etc into MongoDB)
 - BacktestEngine (counterpart of `TradingEngine`) and Backtester (counterpart of `Trader` class)
 
 
